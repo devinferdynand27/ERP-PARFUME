@@ -1,0 +1,17 @@
+FITUR : 
+- git checkout -b "login" erp_master/master (master = branch production)
+- git add nama file 
+- nama commit (nama task)
+- push ke branch nomor 1
+- merge ke master / prod
+- pull di prod 
+
+BUG : 
+- benarkan langsung di prod 
+- git add nama file 
+- push ke prod 
+
+
+
+
+
