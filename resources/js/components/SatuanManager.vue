@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
 import {
-    Pencil, Trash2, Search, Download, ChevronDown,
+    Pencil, Check, Minus, Search, Download, ChevronDown,
 } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { colorFor, initialOf } from '@/lib/avatar-color';
@@ -21,8 +21,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const EXPORT_COLUMNS = [
-    { key: 'nama_aroma', label: 'Aroma' },
-    { key: 'kategori', label: 'Kategori' },
+    { key: 'nama_satuan', label: 'Satuan' },
+    { key: 'tipe', label: 'Tipe' },
+    { key: 'isi', label: 'Isi' },
+    { key: 'status', label: 'Status' },
 ];
 
 const props = defineProps({
@@ -41,12 +43,12 @@ const loading = ref(false);
 const errorMessage = ref('');
 
 const dialogOpen = ref(false);
-const editingArid = ref(null);
-const form = reactive({ nama_aroma: '', kategori: '' });
+const editingStid = ref(null);
+const form = reactive({ nama_satuan: '', tipe: '', isi: '' });
 const formErrors = ref({});
 
-function buildUrl(template, arid) {
-    return template.replace('__arid__', arid);
+function buildUrl(template, stid) {
+    return template.replace('__stid__', stid);
 }
 
 async function loadData() {
@@ -60,24 +62,26 @@ async function loadData() {
         items.value = result.data;
         total.value = result.total;
     } catch (e) {
-        errorMessage.value = 'Gagal memuat data aroma.';
+        errorMessage.value = 'Gagal memuat data satuan.';
     } finally {
         loading.value = false;
     }
 }
 
 function openCreate() {
-    editingArid.value = null;
-    form.nama_aroma = '';
-    form.kategori = '';
+    editingStid.value = null;
+    form.nama_satuan = '';
+    form.tipe = '';
+    form.isi = '';
     formErrors.value = {};
     dialogOpen.value = true;
 }
 
 function openEdit(item) {
-    editingArid.value = item.arid;
-    form.nama_aroma = item.nama_aroma;
-    form.kategori = item.kategori;
+    editingStid.value = item.stid;
+    form.nama_satuan = item.nama_satuan;
+    form.tipe = item.tipe;
+    form.isi = item.isi;
     formErrors.value = {};
     dialogOpen.value = true;
 }
@@ -85,8 +89,8 @@ function openEdit(item) {
 async function submitForm() {
     formErrors.value = {};
     try {
-        if (editingArid.value) {
-            await http.put(buildUrl(props.updateUrlTemplate, editingArid.value), form);
+        if (editingStid.value) {
+            await http.put(buildUrl(props.updateUrlTemplate, editingStid.value), form);
         } else {
             await http.post(props.storeUrl, form);
         }
@@ -96,31 +100,37 @@ async function submitForm() {
         if (e.status === 422 && e.body?.errors) {
             formErrors.value = e.body.errors;
         } else {
-            errorMessage.value = 'Gagal menyimpan data aroma.';
+            errorMessage.value = 'Gagal menyimpan data satuan.';
         }
     }
 }
 
-async function nonaktifkan(item) {
-    if (!confirm(`Nonaktifkan aroma "${item.nama_aroma}"?`)) return;
+async function toggleAktif(item) {
+    const aksi = item.aktif ? 'Nonaktifkan' : 'Aktifkan';
+    if (!confirm(`${aksi} satuan "${item.nama_satuan}"?`)) return;
     try {
-        await http.patch(buildUrl(props.toggleUrlTemplate, item.arid));
+        await http.patch(buildUrl(props.toggleUrlTemplate, item.stid));
         await loadData();
     } catch (e) {
-        errorMessage.value = e.body?.message ?? 'Gagal menonaktifkan aroma.';
+        errorMessage.value = e.body?.message ?? 'Gagal mengubah status satuan.';
     }
 }
 
 async function loadAllForExport() {
     const params = new URLSearchParams({ page: 1, per_page: 1000000 });
     if (search.value) params.set('search', search.value);
+
     const result = await http.get(`${props.dataUrl}?${params.toString()}`);
-    return result.data;
+    return result.data.map((item) => ({
+        ...item,
+        status: item.aktif ? 'Aktif' : 'Nonaktif',
+    }));
 }
 
 async function handleExportExcel() {
     try {
-        exportToExcel(EXPORT_COLUMNS, await loadAllForExport(), 'master-aroma');
+        const rows = await loadAllForExport();
+        exportToExcel(EXPORT_COLUMNS, rows, 'master-satuan');
     } catch (e) {
         errorMessage.value = 'Gagal export Excel.';
     }
@@ -128,7 +138,8 @@ async function handleExportExcel() {
 
 async function handleExportPdf() {
     try {
-        exportToPdf(EXPORT_COLUMNS, await loadAllForExport(), 'master-aroma', 'Master Aroma');
+        const rows = await loadAllForExport();
+        exportToPdf(EXPORT_COLUMNS, rows, 'master-satuan', 'Master Satuan');
     } catch (e) {
         errorMessage.value = 'Gagal export PDF.';
     }
@@ -136,7 +147,8 @@ async function handleExportPdf() {
 
 async function handlePrint() {
     try {
-        printTable(EXPORT_COLUMNS, await loadAllForExport(), 'Master Aroma');
+        const rows = await loadAllForExport();
+        printTable(EXPORT_COLUMNS, rows, 'Master Satuan');
     } catch (e) {
         errorMessage.value = 'Gagal mencetak data.';
     }
@@ -160,8 +172,8 @@ onMounted(loadData);
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Master Aroma</h1>
-                <p class="text-sm text-muted-foreground">Kelola varian aroma parfum</p>
+                <h1 class="text-2xl font-bold tracking-tight">Master Satuan</h1>
+                <p class="text-sm text-muted-foreground">Kelola satuan, tipe, dan isi</p>
             </div>
             <div class="flex items-center gap-2">
                 <DropdownMenu>
@@ -178,7 +190,7 @@ onMounted(loadData);
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <Button @click="openCreate">
-                    <span class="mr-1 text-base leading-none">+</span> Tambah Aroma
+                    <span class="mr-1 text-base leading-none">+</span> Tambah Satuan
                 </Button>
             </div>
         </div>
@@ -189,7 +201,7 @@ onMounted(loadData);
             <div class="flex items-center justify-between gap-4 border-b border-border p-4">
                 <div class="relative max-w-xs flex-1">
                     <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input v-model="search" placeholder="Cari nama aroma atau kategori..." class="pl-9" />
+                    <Input v-model="search" placeholder="Cari satuan..." class="pl-9" />
                 </div>
                 <span class="shrink-0 text-sm text-muted-foreground">{{ total }} data</span>
             </div>
@@ -197,30 +209,42 @@ onMounted(loadData);
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead class="uppercase tracking-wide text-xs">Aroma</TableHead>
-                        <TableHead class="uppercase tracking-wide text-xs">Kategori</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs">Satuan</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs">Tipe</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs">Isi</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs">Status</TableHead>
                         <TableHead class="text-right uppercase tracking-wide text-xs">Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow v-if="loading">
-                        <TableCell colspan="3" class="text-center text-muted-foreground">Memuat...</TableCell>
+                        <TableCell colspan="5" class="text-center text-muted-foreground">Memuat...</TableCell>
                     </TableRow>
-                    <TableEmpty v-else-if="items.length === 0" :colspan="3">
-                        Belum ada data aroma.
+                    <TableEmpty v-else-if="items.length === 0" :colspan="5">
+                        Belum ada data satuan.
                     </TableEmpty>
-                    <TableRow v-for="item in items" :key="item.arid">
+                    <TableRow v-for="item in items" :key="item.stid">
                         <TableCell>
                             <div class="flex items-center gap-3">
                                 <Avatar class="size-9 rounded-lg">
-                                    <AvatarFallback :class="['rounded-lg font-semibold', colorFor(item.nama_aroma)]">
-                                        {{ initialOf(item.nama_aroma) }}
+                                    <AvatarFallback :class="['rounded-lg font-semibold', colorFor(item.nama_satuan)]">
+                                        {{ initialOf(item.nama_satuan) }}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span class="font-medium">{{ item.nama_aroma }}</span>
+                                <span class="font-medium">{{ item.nama_satuan }}</span>
                             </div>
                         </TableCell>
-                        <TableCell>{{ item.kategori }}</TableCell>
+                        <TableCell>{{ item.tipe }}</TableCell>
+                        <TableCell>{{ item.isi }}</TableCell>
+                        <TableCell>
+                            <span class="inline-flex items-center gap-1.5 text-sm">
+                                <span
+                                    class="size-2 rounded-full"
+                                    :class="item.aktif ? 'bg-emerald-500' : 'bg-muted-foreground/40'"
+                                ></span>
+                                {{ item.aktif ? 'Aktif' : 'Nonaktif' }}
+                            </span>
+                        </TableCell>
                         <TableCell class="text-right">
                             <div class="flex justify-end gap-2">
                                 <button
@@ -232,10 +256,15 @@ onMounted(loadData);
                                 </button>
                                 <button
                                     type="button"
-                                    class="flex size-8 items-center justify-center rounded-md bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90"
-                                    @click="nonaktifkan(item)"
+                                    class="flex size-8 items-center justify-center rounded-md transition-colors"
+                                    :class="item.aktif
+                                        ? 'bg-emerald-600 text-white hover:bg-emerald-600/90'
+                                        : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'"
+                                    :title="item.aktif ? 'Nonaktifkan' : 'Aktifkan'"
+                                    @click="toggleAktif(item)"
                                 >
-                                    <Trash2 class="size-4" />
+                                    <Check v-if="item.aktif" class="size-4" />
+                                    <Minus v-else class="size-4" />
                                 </button>
                             </div>
                         </TableCell>
@@ -256,21 +285,28 @@ onMounted(loadData);
         <Dialog v-model:open="dialogOpen">
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{ editingArid ? 'Edit Aroma' : 'Tambah Aroma' }}</DialogTitle>
+                    <DialogTitle>{{ editingStid ? 'Edit Satuan' : 'Tambah Satuan' }}</DialogTitle>
                 </DialogHeader>
                 <form class="space-y-4" @submit.prevent="submitForm">
                     <div class="space-y-2">
-                        <Label for="nama_aroma">Nama Aroma</Label>
-                        <Input id="nama_aroma" v-model="form.nama_aroma" />
-                        <p v-if="formErrors.nama_aroma" class="text-sm text-destructive">
-                            {{ formErrors.nama_aroma[0] }}
+                        <Label for="nama_satuan">Satuan</Label>
+                        <Input id="nama_satuan" v-model="form.nama_satuan" placeholder="pcs, box, liter" />
+                        <p v-if="formErrors.nama_satuan" class="text-sm text-destructive">
+                            {{ formErrors.nama_satuan[0] }}
                         </p>
                     </div>
                     <div class="space-y-2">
-                        <Label for="kategori">Kategori</Label>
-                        <Input id="kategori" v-model="form.kategori" placeholder="Floral, Woody, Oriental, Fresh, Sweet" />
-                        <p v-if="formErrors.kategori" class="text-sm text-destructive">
-                            {{ formErrors.kategori[0] }}
+                        <Label for="tipe">Tipe</Label>
+                        <Input id="tipe" v-model="form.tipe" placeholder="berat, volume, jumlah" />
+                        <p v-if="formErrors.tipe" class="text-sm text-destructive">
+                            {{ formErrors.tipe[0] }}
+                        </p>
+                    </div>
+                    <div class="space-y-2">
+                        <Label for="isi">Isi</Label>
+                        <Input id="isi" v-model="form.isi" type="number" step="0.01" min="0" placeholder="0" />
+                        <p v-if="formErrors.isi" class="text-sm text-destructive">
+                            {{ formErrors.isi[0] }}
                         </p>
                     </div>
                     <DialogFooter>
