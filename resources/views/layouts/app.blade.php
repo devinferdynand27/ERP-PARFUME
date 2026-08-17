@@ -20,6 +20,7 @@
                     'kualitasBibit' => route('kualitas-bibit.index'),
                     'supplier' => route('supplier.index'),
                     'aroma' => route('aroma.index'),
+                    'satuan' => route('satuan.index'),
                 ],
             ]) }}"
         ></div>

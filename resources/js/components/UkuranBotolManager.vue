@@ -1,8 +1,11 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
-import { Pencil, Trash2, Search } from '@lucide/vue';
+import {
+    Pencil, Trash2, Search, Download, ChevronDown,
+} from '@lucide/vue';
 import { http } from '@/lib/http';
 import { colorFor, initialOf } from '@/lib/avatar-color';
+import { exportToExcel, exportToPdf, printTable } from '@/lib/export';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +16,13 @@ import {
 import {
     Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+const EXPORT_COLUMNS = [
+    { key: 'ukuran', label: 'Ukuran' },
+];
 
 const props = defineProps({
     dataUrl: { type: String, required: true },
@@ -98,6 +108,37 @@ async function nonaktifkan(item) {
     }
 }
 
+async function loadAllForExport() {
+    const params = new URLSearchParams({ page: 1, per_page: 1000000 });
+    if (search.value) params.set('search', search.value);
+    const result = await http.get(`${props.dataUrl}?${params.toString()}`);
+    return result.data;
+}
+
+async function handleExportExcel() {
+    try {
+        exportToExcel(EXPORT_COLUMNS, await loadAllForExport(), 'master-ukuran-botol');
+    } catch (e) {
+        errorMessage.value = 'Gagal export Excel.';
+    }
+}
+
+async function handleExportPdf() {
+    try {
+        exportToPdf(EXPORT_COLUMNS, await loadAllForExport(), 'master-ukuran-botol', 'Master Ukuran Botol');
+    } catch (e) {
+        errorMessage.value = 'Gagal export PDF.';
+    }
+}
+
+async function handlePrint() {
+    try {
+        printTable(EXPORT_COLUMNS, await loadAllForExport(), 'Master Ukuran Botol');
+    } catch (e) {
+        errorMessage.value = 'Gagal mencetak data.';
+    }
+}
+
 let searchTimeout = null;
 watch(search, () => {
     clearTimeout(searchTimeout);
@@ -119,9 +160,24 @@ onMounted(loadData);
                 <h1 class="text-2xl font-bold tracking-tight">Master Ukuran Botol</h1>
                 <p class="text-sm text-muted-foreground">Kelola variasi kapasitas botol</p>
             </div>
-            <Button @click="openCreate">
-                <span class="mr-1 text-base leading-none">+</span> Tambah Ukuran
-            </Button>
+            <div class="flex items-center gap-2">
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <Button variant="outline">
+                            <Download class="mr-1 size-4" /> Export
+                            <ChevronDown class="ml-1 size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem @click="handleExportExcel">Export Excel</DropdownMenuItem>
+                        <DropdownMenuItem @click="handleExportPdf">Download PDF</DropdownMenuItem>
+                        <DropdownMenuItem @click="handlePrint">Print</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <Button @click="openCreate">
+                    <span class="mr-1 text-base leading-none">+</span> Tambah Ukuran
+                </Button>
+            </div>
         </div>
 
         <p v-if="errorMessage" class="text-sm text-destructive">{{ errorMessage }}</p>

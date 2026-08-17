@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import {
-    LayoutDashboard, Package, Ruler, FlaskConical, Truck,
+    LayoutDashboard, Package, Ruler, FlaskConical, Truck, Scale,
 } from '@lucide/vue';
 
 const props = defineProps({
@@ -31,6 +31,7 @@ const masterData = [
     { key: 'kualitas-bibit', label: 'Master Kualitas Bibit', icon: FlaskConical, urlKey: 'kualitasBibit' },
     { key: 'supplier', label: 'Master Supplier', icon: Truck, urlKey: 'supplier' },
     { key: 'aroma', label: 'Master Aroma', icon: FlaskConical, urlKey: 'aroma' },
+    { key: 'satuan', label: 'Master Satuan', icon: Scale, urlKey: 'satuan' },
 ];
 </script>
 

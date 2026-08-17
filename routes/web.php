@@ -3,6 +3,7 @@
 use App\Http\Controllers\AromaController;
 use App\Http\Controllers\KualitasBibitController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UkuranBotolController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,14 @@ Route::prefix('master/supplier')->name('supplier.')->group(function () {
     Route::post('/', [SupplierController::class, 'store'])->name('store');
     Route::put('/{spid}', [SupplierController::class, 'update'])->name('update');
     Route::patch('/{spid}/toggle-aktif', [SupplierController::class, 'toggleAktif'])->name('toggle-aktif');
+});
+
+Route::prefix('master/satuan')->name('satuan.')->group(function () {
+    Route::get('/', [SatuanController::class, 'index'])->name('index');
+    Route::get('/data', [SatuanController::class, 'data'])->name('data');
+    Route::post('/', [SatuanController::class, 'store'])->name('store');
+    Route::put('/{stid}', [SatuanController::class, 'update'])->name('update');
+    Route::patch('/{stid}/toggle-aktif', [SatuanController::class, 'toggleAktif'])->name('toggle-aktif');
 });
 
 Route::prefix('master/produk')->name('produk.')->group(function () {
