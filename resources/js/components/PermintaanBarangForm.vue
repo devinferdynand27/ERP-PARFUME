@@ -20,7 +20,7 @@ const props = defineProps({
 
 const isEdit = !!props.pbid;
 
-const produkOptions = ref([]);
+const aromaOptions = ref([]);
 const satuanOptions = ref([]);
 const loading = ref(true);
 const saving = ref(false);
@@ -34,7 +34,7 @@ const formItems = ref([]);
 const formErrors = ref({});
 
 function addRow() {
-    formItems.value.push({ prid: null, stid: null, qty_diminta: 1 });
+    formItems.value.push({ arid: null, stid: null, qty_diminta: 1 });
 }
 
 function removeRow(index) {
@@ -44,7 +44,7 @@ function removeRow(index) {
 async function load() {
     loading.value = true;
     const options = await http.get(props.formOptionsUrl);
-    produkOptions.value = options.produk;
+    aromaOptions.value = options.aroma;
     satuanOptions.value = options.satuan;
 
     if (isEdit) {
@@ -52,7 +52,7 @@ async function load() {
         form.tanggal = detail.header.tanggal;
         form.catatan = detail.header.catatan ?? '';
         formItems.value = detail.items.map((i) => ({
-            prid: i.prid, stid: i.stid, qty_diminta: Number(i.qty_diminta),
+            arid: i.arid, stid: i.stid, qty_diminta: Number(i.qty_diminta),
         }));
     } else {
         formItems.value = [];
@@ -130,10 +130,10 @@ onMounted(() => {
 
                 <div class="rounded-lg border border-border">
                     <div v-for="(row, index) in formItems" :key="index" class="grid grid-cols-[1fr_1fr_100px_36px] gap-2 border-b border-border p-2 last:border-b-0">
-                        <Select v-model="row.prid">
-                            <SelectTrigger><SelectValue placeholder="Pilih produk" /></SelectTrigger>
+                        <Select v-model="row.arid">
+                            <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem v-for="p in produkOptions" :key="p.prid" :value="p.prid">{{ p.nama_produk }}</SelectItem>
+                                <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select v-model="row.stid">

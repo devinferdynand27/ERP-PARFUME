@@ -21,7 +21,7 @@ const loading = ref(true);
 const saving = ref(false);
 const errorMessage = ref('');
 
-const produkOptions = ref([]);
+const aromaOptions = ref([]);
 const satuanOptions = ref([]);
 const supplierOptions = ref([]);
 const permintaanDisetujui = ref([]);
@@ -50,7 +50,7 @@ const previewTotal = computed(() => formItems.value.reduce(
 
 function addRow() {
     formItems.value.push({
-        pbdid: null, prid: null, stid: null, qty_dipesan: 1, harga_satuan: 0,
+        pbdid: null, arid: null, stid: null, qty_dipesan: 1, harga_satuan: 0,
     });
 }
 
@@ -64,7 +64,7 @@ async function load() {
         http.get(props.formOptionsUrl),
         http.get(`${props.permintaanBarangDataUrl}?status=disetujui&per_page=1000`),
     ]);
-    produkOptions.value = options.produk;
+    aromaOptions.value = options.aroma;
     satuanOptions.value = options.satuan;
     supplierOptions.value = options.supplier;
     permintaanDisetujui.value = prResult.data;
@@ -77,7 +77,7 @@ watch(selectedPbid, async (pbid) => {
     const result = await http.get(buildUrl(props.dariPermintaanUrlTemplate, pbid));
     formItems.value = result.items.map((i) => ({
         pbdid: i.pbdid,
-        prid: i.prid,
+        arid: i.arid,
         stid: i.stid,
         qty_dipesan: Number(i.qty_diminta),
         harga_satuan: 0,
@@ -175,10 +175,10 @@ onMounted(() => {
 
                 <div class="rounded-lg border border-border">
                     <div v-for="(row, index) in formItems" :key="index" class="grid grid-cols-[1fr_90px_100px_130px_36px] gap-2 border-b border-border p-2 last:border-b-0">
-                        <Select v-model="row.prid" :disabled="selectedPbid !== 'none'">
-                            <SelectTrigger><SelectValue placeholder="Pilih produk" /></SelectTrigger>
+                        <Select v-model="row.arid" :disabled="selectedPbid !== 'none'">
+                            <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem v-for="p in produkOptions" :key="p.prid" :value="p.prid">{{ p.nama_produk }}</SelectItem>
+                                <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select v-model="row.stid" :disabled="selectedPbid !== 'none'">

@@ -6,7 +6,6 @@ use App\Http\Controllers\AromaController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\PermintaanBarangController;
 use App\Http\Controllers\PesananPembelianController;
-use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -43,24 +42,6 @@ Route::prefix('master/supplier')->name('supplier.')->group(function () {
             Route::patch('/{arid}/toggle-aktif', [AromaController::class, 'toggleAktif'])->name('toggle-aktif');
         });
 
-        // Master Ukuran Botol
-        Route::prefix('master/ukuran-botol')->name('ukuran-botol.')->group(function () {
-            Route::get('/', [UkuranBotolController::class, 'index'])->name('index');
-            Route::get('/data', [UkuranBotolController::class, 'data'])->name('data');
-            Route::post('/', [UkuranBotolController::class, 'store'])->name('store');
-            Route::put('/{ubid}', [UkuranBotolController::class, 'update'])->name('update');
-            Route::patch('/{ubid}/toggle-aktif', [UkuranBotolController::class, 'toggleAktif'])->name('toggle-aktif');
-        });
-
-        // Master Kualitas Bibit
-        Route::prefix('master/kualitas-bibit')->name('kualitas-bibit.')->group(function () {
-            Route::get('/', [KualitasBibitController::class, 'index'])->name('index');
-            Route::get('/data', [KualitasBibitController::class, 'data'])->name('data');
-            Route::post('/', [KualitasBibitController::class, 'store'])->name('store');
-            Route::put('/{kbid}', [KualitasBibitController::class, 'update'])->name('update');
-            Route::patch('/{kbid}/toggle-aktif', [KualitasBibitController::class, 'toggleAktif'])->name('toggle-aktif');
-        });
-
         // Master Supplier
         Route::prefix('master/supplier')->name('supplier.')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('index');
@@ -77,16 +58,6 @@ Route::prefix('master/supplier')->name('supplier.')->group(function () {
             Route::post('/', [SatuanController::class, 'store'])->name('store');
             Route::put('/{stid}', [SatuanController::class, 'update'])->name('update');
             Route::patch('/{stid}/toggle-aktif', [SatuanController::class, 'toggleAktif'])->name('toggle-aktif');
-        });
-
-        // Master Produk
-        Route::prefix('master/produk')->name('produk.')->group(function () {
-            Route::get('/', [ProdukController::class, 'index'])->name('index');
-            Route::get('/data', [ProdukController::class, 'data'])->name('data');
-            Route::get('/form-options', [ProdukController::class, 'formOptions'])->name('form-options');
-            Route::post('/', [ProdukController::class, 'store'])->name('store');
-            Route::put('/{prid}', [ProdukController::class, 'update'])->name('update');
-            Route::patch('/{prid}/toggle-aktif', [ProdukController::class, 'toggleAktif'])->name('toggle-aktif');
         });
     });
 });

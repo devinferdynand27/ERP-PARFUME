@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\PenerimaanBarangRepository;
 use App\Repositories\PesananPembelianRepository;
-use App\Repositories\ProdukRepository;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +13,6 @@ class PenerimaanBarangController extends Controller
     public function __construct(
         private PenerimaanBarangRepository $penerimaanBarangRepository,
         private PesananPembelianRepository $pesananPembelianRepository,
-        private ProdukRepository $produkRepository,
     ) {
     }
 
@@ -115,14 +113,19 @@ class PenerimaanBarangController extends Controller
 
                 $this->penerimaanBarangRepository->insertItem($pnid, [
                     'ppdid' => $item['ppdid'],
-                    'prid' => $detail->prid,
+                    'arid' => $detail->arid,
                     'stid' => $ppDetailFull->stid,
                     'qty_diterima' => $item['qty_diterima'],
                     'harga_beli' => $ppDetailFull->harga_satuan,
                 ]);
 
                 $this->pesananPembelianRepository->addQtyDiterima($item['ppdid'], $item['qty_diterima']);
-                $this->produkRepository->adjustStok($detail->prid, (int) $item['qty_diterima']);
+                // Catatan: dulu di sini juga memanggil produkRepository->adjustStok()
+                // untuk menambah stok produk. Modul Master Produk sudah dihapus dan
+                // tabel produk tidak lagi dipakai di alur transaksi ini (diganti ke
+                // aroma yang tidak punya kolom stok), jadi pemanggilan itu dihapus.
+                // Penerimaan barang di modul ini murni mencatat riwayat penerimaan
+                // per aroma, tidak lagi menambah stok otomatis seperti sebelumnya.
             }
 
             $this->pesananPembelianRepository->recomputeStatus($ppid, $adid);

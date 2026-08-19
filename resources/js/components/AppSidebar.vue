@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import {
-    LayoutDashboard, Package, FlaskConical, Truck, Scale,
-    ClipboardList, ShoppingCart, PackageCheck,
-    LayoutDashboard, Package, Ruler, FlaskConical, Truck, Scale, X
+    LayoutDashboard, FlaskConical, Truck, Scale,
+    ClipboardList, ShoppingCart, PackageCheck, X
 } from '@lucide/vue';
 
 const props = defineProps({
@@ -39,7 +38,6 @@ const menu = [
 ];
 
 const masterData = [
-    { key: 'produk', label: 'Master Produk', icon: Package, urlKey: 'produk' },
     { key: 'supplier', label: 'Master Supplier', icon: Truck, urlKey: 'supplier' },
     { key: 'aroma', label: 'Master Aroma', icon: FlaskConical, urlKey: 'aroma' },
     { key: 'satuan', label: 'Master Satuan', icon: Scale, urlKey: 'satuan' },
@@ -99,20 +97,6 @@ const transaksi = [
             >
                 <component :is="item.icon" class="size-[18px]" />
                 <span>{{ item.label }}</span>
-            </a>
-
-            <div class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Master Data
-            </div>
-            <a
-                v-for="item in masterData"
-                :key="item.key"
-                :href="urls[item.urlKey]"
-                class="flex items-center gap-3 rounded-md px-3 py-2 font-medium transition-colors"
-                :class="active === item.key ? 'bg-foreground text-background' : 'text-foreground hover:bg-accent'"
-            >
-                <component :is="item.icon" class="size-4" />
-                {{ item.label }}
             </a>
 
             <div class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

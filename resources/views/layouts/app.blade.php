@@ -16,7 +16,6 @@
                 'userRole' => auth()->user()?->role ?? 'guest',
                 'urls' => [
                     'dashboard' => url('/'),
-                    'produk' => route('produk.index'),
                     'supplier' => route('supplier.index'),
                     'aroma' => route('aroma.index'),
                     'satuan' => route('satuan.index'),

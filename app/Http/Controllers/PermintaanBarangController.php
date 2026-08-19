@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\AromaRepository;
 use App\Repositories\PermintaanBarangRepository;
-use App\Repositories\ProdukRepository;
 use App\Repositories\SatuanRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ class PermintaanBarangController extends Controller
 {
     public function __construct(
         private PermintaanBarangRepository $permintaanBarangRepository,
-        private ProdukRepository $produkRepository,
+        private AromaRepository $aromaRepository,
         private SatuanRepository $satuanRepository,
     ) {
     }
@@ -56,7 +56,7 @@ class PermintaanBarangController extends Controller
     public function formOptions()
     {
         return response()->json([
-            'produk' => $this->produkRepository->getAktif(),
+            'aroma' => $this->aromaRepository->getAktif(),
             'satuan' => $this->satuanRepository->getAktif(),
             'nomor_permintaan_berikutnya' => $this->permintaanBarangRepository->generateNomorPermintaan(),
         ]);
@@ -79,7 +79,7 @@ class PermintaanBarangController extends Controller
             'tanggal' => ['required', 'date'],
             'catatan' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.prid' => ['required', 'integer', 'exists:produk,prid'],
+            'items.*.arid' => ['required', 'integer', 'exists:aroma,arid'],
             'items.*.stid' => ['required', 'integer', 'exists:satuan,stid'],
             'items.*.qty_diminta' => ['required', 'numeric', 'min:0.01'],
         ]);

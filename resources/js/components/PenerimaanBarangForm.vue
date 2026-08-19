@@ -93,7 +93,7 @@ onMounted(() => {
             </a>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Terima Barang</h1>
-                <p class="text-sm text-muted-foreground">Catat penerimaan fisik barang dari pesanan pembelian — stok bertambah otomatis</p>
+                <p class="text-sm text-muted-foreground">Catat penerimaan fisik barang dari pesanan pembelian</p>
             </div>
         </div>
 
@@ -134,7 +134,7 @@ onMounted(() => {
                 <div class="rounded-lg border border-border">
                     <div v-for="row in sisaItems" :key="row.ppdid" class="grid grid-cols-[1fr_100px_120px] items-center gap-2 border-b border-border p-2 last:border-b-0">
                         <div>
-                            <div class="text-sm font-medium">{{ row.nama_produk }}</div>
+                            <div class="text-sm font-medium">{{ row.nama_aroma }}</div>
                             <div class="text-xs text-muted-foreground">Sisa: {{ row.sisa }} {{ row.nama_satuan }}</div>
                         </div>
                         <Input v-model="qtyInput[row.ppdid]" type="number" min="0" :max="row.sisa" step="0.01" placeholder="Qty" />
