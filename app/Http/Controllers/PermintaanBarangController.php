@@ -84,6 +84,17 @@ class PermintaanBarangController extends Controller
         ]);
     }
 
+    public function print(int $pbid)
+    {
+        $header = $this->permintaanBarangRepository->find($pbid);
+        abort_if(! $header, 404);
+
+        return view('permintaan-barang.print', [
+            'header' => $header,
+            'items' => $this->permintaanBarangRepository->getItems($pbid),
+        ]);
+    }
+
     private function validatedPayload(Request $request): array
     {
         return $request->validate([
@@ -152,6 +163,17 @@ class PermintaanBarangController extends Controller
         $this->permintaanBarangRepository->updateStatus($pbid, $validated['status'], optional($request->user())->adid);
 
         return response()->json($this->showPayload($pbid));
+    }
+
+    public function destroy(int $pbid)
+    {
+        $header = $this->permintaanBarangRepository->find($pbid);
+        abort_if(! $header, 404);
+        abort_if($header->status !== 'draft', 422, 'Hanya permintaan berstatus draft yang bisa dihapus.');
+
+        $this->permintaanBarangRepository->delete($pbid);
+
+        return response()->json(['message' => 'Permintaan barang berhasil dihapus.']);
     }
 
     private function showPayload(int $pbid): array

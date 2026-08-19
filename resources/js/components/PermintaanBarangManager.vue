@@ -1,6 +1,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { Pencil, Search, Plus } from '@lucide/vue';
+import {
+    Pencil, Search, Plus, Printer, Trash2,
+} from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +33,8 @@ const props = defineProps({
     createUrl: { type: String, required: true },
     editUrlTemplate: { type: String, required: true },
     statusUrlTemplate: { type: String, required: true },
+    printUrlTemplate: { type: String, required: true },
+    deleteUrlTemplate: { type: String, required: true },
 });
 
 const items = ref([]);
@@ -72,6 +76,17 @@ async function ubahStatus(item, status) {
         await loadData();
     } catch (e) {
         errorMessage.value = e.body?.message ?? 'Gagal mengubah status.';
+    }
+}
+
+async function hapus(item) {
+    if (!confirm(`Hapus permintaan "${item.nomor_permintaan}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+    try {
+        await http.delete(buildUrl(props.deleteUrlTemplate, item.pbid));
+        if (items.value.length === 1 && page.value > 1) page.value--;
+        await loadData();
+    } catch (e) {
+        errorMessage.value = e.body?.message ?? 'Gagal menghapus permintaan barang.';
     }
 }
 
@@ -160,12 +175,30 @@ onMounted(() => {
                         <TableCell class="text-right">
                             <div class="flex justify-end gap-2">
                                 <a
+                                    :href="buildUrl(printUrlTemplate, item.pbid)"
+                                    target="_blank"
+                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    title="Cetak"
+                                >
+                                    <Printer class="size-4" />
+                                </a>
+                                <a
                                     v-if="item.status === 'draft'"
                                     :href="buildUrl(editUrlTemplate, item.pbid)"
                                     class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    title="Edit"
                                 >
                                     <Pencil class="size-4" />
                                 </a>
+                                <button
+                                    v-if="item.status === 'draft'"
+                                    type="button"
+                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-destructive"
+                                    title="Hapus"
+                                    @click="hapus(item)"
+                                >
+                                    <Trash2 class="size-4" />
+                                </button>
                                 <Button v-if="item.status === 'draft'" size="sm" variant="outline" @click="ubahStatus(item, 'diajukan')">Ajukan</Button>
                                 <Button v-if="item.status === 'diajukan'" size="sm" variant="outline" @click="ubahStatus(item, 'disetujui')">Setujui</Button>
                                 <Button v-if="item.status === 'diajukan'" size="sm" variant="outline" class="text-destructive" @click="ubahStatus(item, 'ditolak')">Tolak</Button>
