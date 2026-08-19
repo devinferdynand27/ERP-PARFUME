@@ -131,15 +131,27 @@ onMounted(() => {
             <div v-if="selectedPpid" class="space-y-2">
                 <Label>Item yang Diterima</Label>
                 <p v-if="formErrors.items" class="text-sm text-destructive">{{ formErrors.items[0] }}</p>
-                <div class="rounded-lg border border-border">
-                    <div v-for="row in sisaItems" :key="row.ppdid" class="grid grid-cols-[1fr_100px_120px] items-center gap-2 border-b border-border p-2 last:border-b-0">
-                        <div>
-                            <div class="text-sm font-medium">{{ row.nama_aroma }}</div>
-                            <div class="text-xs text-muted-foreground">Sisa: {{ row.sisa }} {{ row.nama_satuan }}</div>
-                        </div>
-                        <Input v-model="qtyInput[row.ppdid]" type="number" min="0" :max="row.sisa" step="0.01" placeholder="Qty" />
-                        <span class="text-xs text-muted-foreground">{{ row.nama_satuan }}</span>
-                    </div>
+                <div class="overflow-hidden rounded-lg border border-border">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-border bg-muted/50 text-left text-xs font-medium text-foreground">
+                                <th class="p-2 font-medium">Aroma</th>
+                                <th class="w-[110px] p-2 font-medium">Sisa PO</th>
+                                <th class="w-[120px] p-2 font-medium">Qty Diterima</th>
+                                <th class="w-[90px] p-2 font-medium">Satuan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="row in sisaItems" :key="row.ppdid" class="border-b border-border last:border-b-0">
+                                <td class="p-2 align-middle text-sm font-medium">{{ row.nama_aroma }}</td>
+                                <td class="p-2 align-middle text-muted-foreground">{{ row.sisa }} {{ row.nama_satuan }}</td>
+                                <td class="p-2 align-middle">
+                                    <Input v-model="qtyInput[row.ppdid]" type="number" min="0" :max="row.sisa" step="0.01" placeholder="Qty" />
+                                </td>
+                                <td class="p-2 align-middle text-xs text-muted-foreground">{{ row.nama_satuan }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <p v-if="sisaItems.length === 0" class="p-4 text-center text-sm text-muted-foreground">
                         Semua item PO ini sudah diterima penuh.
                     </p>
