@@ -7,6 +7,7 @@ import {
 const props = defineProps({
     active: { type: String, required: true },
     urls: { type: Object, required: true },
+    userRole: { type: String, default: 'admin' },
 });
 
 // Sidebar tidak ikut di-remount saat navigasi tanpa reload (lihat lib/navigate.js
@@ -56,19 +57,21 @@ const masterData = [
                 {{ item.label }}
             </a>
 
-            <div class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Master Data
-            </div>
-            <a
-                v-for="item in masterData"
-                :key="item.key"
-                :href="urls[item.urlKey]"
-                class="flex items-center gap-3 rounded-md px-3 py-2 font-medium transition-colors"
-                :class="active === item.key ? 'bg-foreground text-background' : 'text-foreground hover:bg-accent'"
-            >
-                <component :is="item.icon" class="size-4" />
-                {{ item.label }}
-            </a>
+            <template v-if="userRole === 'admin'">
+                <div class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Master Data
+                </div>
+                <a
+                    v-for="item in masterData"
+                    :key="item.key"
+                    :href="urls[item.urlKey]"
+                    class="flex items-center gap-3 rounded-md px-3 py-2 font-medium transition-colors"
+                    :class="active === item.key ? 'bg-foreground text-background' : 'text-foreground hover:bg-accent'"
+                >
+                    <component :is="item.icon" class="size-4" />
+                    {{ item.label }}
+                </a>
+            </template>
         </nav>
     </aside>
 </template>
