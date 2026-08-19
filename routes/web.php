@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [PermintaanBarangController::class, 'index'])->name('index');
         Route::get('/data', [PermintaanBarangController::class, 'data'])->name('data');
         Route::get('/form-options', [PermintaanBarangController::class, 'formOptions'])->name('form-options');
+        Route::get('/aroma-data', [PermintaanBarangController::class, 'aromaData'])->name('aroma-data');
         Route::get('/create', [PermintaanBarangController::class, 'create'])->name('create');
         Route::get('/{pbid}/edit', [PermintaanBarangController::class, 'edit'])->name('edit');
         Route::get('/{pbid}', [PermintaanBarangController::class, 'show'])->name('show');

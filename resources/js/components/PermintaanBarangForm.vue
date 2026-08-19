@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { Plus, Trash2, ArrowLeft } from '@lucide/vue';
+import { ref, reactive, watch, onMounted } from 'vue';
+import { Plus, Trash2, ArrowLeft, List } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,10 +9,14 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Combobox } from '@/components/ui/combobox';
+import {
+    Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
 
 const props = defineProps({
     pbid: { type: [Number, String], default: null },
     formOptionsUrl: { type: String, required: true },
+    aromaDataUrl: { type: String, required: true },
     showUrl: { type: String, default: null },
     storeUrl: { type: String, default: null },
     updateUrl: { type: String, default: null },
@@ -40,6 +44,45 @@ function addRow() {
 
 function removeRow(index) {
     formItems.value.splice(index, 1);
+}
+
+const showAllDialog = ref(false);
+const allBarangSearch = ref('');
+const allBarangResults = ref([]);
+const allBarangLoading = ref(false);
+const allBarangPage = ref(1);
+const allBarangTotal = ref(0);
+const allBarangPerPage = 20;
+
+async function loadAllBarang() {
+    allBarangLoading.value = true;
+    const params = new URLSearchParams({ page: allBarangPage.value, per_page: allBarangPerPage });
+    if (allBarangSearch.value) params.set('search', allBarangSearch.value);
+    const result = await http.get(`${props.aromaDataUrl}?${params}`);
+    allBarangResults.value = result.data;
+    allBarangTotal.value = result.total;
+    allBarangLoading.value = false;
+}
+
+let allBarangSearchTimeout = null;
+watch(allBarangSearch, () => {
+    clearTimeout(allBarangSearchTimeout);
+    allBarangSearchTimeout = setTimeout(() => {
+        allBarangPage.value = 1;
+        loadAllBarang();
+    }, 300);
+});
+watch(allBarangPage, loadAllBarang);
+
+function openAllBarangDialog() {
+    showAllDialog.value = true;
+    allBarangSearch.value = '';
+    allBarangPage.value = 1;
+    loadAllBarang();
+}
+
+function addRowFromDialog(arid) {
+    formItems.value.push({ arid, stid: null, qty_diminta: 1 });
 }
 
 async function load() {
@@ -123,9 +166,14 @@ onMounted(() => {
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <Label>Item Barang</Label>
-                    <Button type="button" size="sm" variant="outline" @click="addRow">
-                        <Plus class="mr-1 size-4" /> Tambah Item
-                    </Button>
+                    <div class="flex items-center gap-2">
+                        <Button type="button" size="sm" variant="outline" @click="openAllBarangDialog">
+                            <List class="mr-1 size-4" /> Lihat Semua Barang
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" @click="addRow">
+                            <Plus class="mr-1 size-4" /> Tambah Item
+                        </Button>
+                    </div>
                 </div>
                 <p v-if="formErrors.items" class="text-sm text-destructive">{{ formErrors.items[0] }}</p>
 
@@ -183,5 +231,42 @@ onMounted(() => {
                 <Button type="submit" :disabled="formItems.length === 0 || saving">Simpan</Button>
             </div>
         </form>
+
+        <Dialog v-model:open="showAllDialog">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Semua Barang (Aroma)</DialogTitle>
+                </DialogHeader>
+                <Input v-model="allBarangSearch" placeholder="Cari aroma..." />
+                <div class="min-h-80 max-h-80 overflow-y-auto rounded-lg border border-border">
+                    <p v-if="allBarangLoading" class="p-4 text-center text-sm text-muted-foreground">
+                        Memuat...
+                    </p>
+                    <template v-else>
+                        <button
+                            v-for="a in allBarangResults"
+                            :key="a.arid"
+                            type="button"
+                            class="flex w-full items-center justify-between border-b border-border p-2.5 text-left text-sm last:border-b-0 hover:bg-accent"
+                            @click="addRowFromDialog(a.arid)"
+                        >
+                            <span>{{ a.nama_aroma }}</span>
+                            <Plus class="size-4 text-muted-foreground" />
+                        </button>
+                        <p v-if="allBarangResults.length === 0" class="p-4 text-center text-sm text-muted-foreground">
+                            Aroma tidak ditemukan.
+                        </p>
+                    </template>
+                </div>
+                <div class="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{{ allBarangTotal }} aroma</span>
+                    <div class="flex items-center gap-2">
+                        <Button type="button" variant="outline" size="sm" :disabled="allBarangPage <= 1" @click="allBarangPage--">‹</Button>
+                        <span class="px-1">{{ allBarangPage }}</span>
+                        <Button type="button" variant="outline" size="sm" :disabled="allBarangPage * allBarangPerPage >= allBarangTotal" @click="allBarangPage++">›</Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

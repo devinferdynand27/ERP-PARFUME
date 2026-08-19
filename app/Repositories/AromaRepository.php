@@ -47,6 +47,36 @@ class AromaRepository
         return ['data' => $data, 'total' => $total];
     }
 
+    /**
+     * Untuk dialog pilih barang di form transaksi (permintaan/pesanan/
+     * penerimaan) — hanya aroma aktif, dipaginate + searchable supaya aman
+     * untuk data ribuan baris (tidak seperti getAktif() yang ambil semua
+     * sekaligus).
+     */
+    public function paginateAktif(int $perPage, int $page, ?string $search = null): array
+    {
+        $offset = ($page - 1) * $perPage;
+        $where = 'WHERE aktif = 1';
+        $bindings = [];
+
+        if ($search !== null && $search !== '') {
+            $where .= ' AND nama_aroma LIKE ?';
+            $bindings[] = "%{$search}%";
+        }
+
+        $total = DB::selectOne("SELECT COUNT(*) AS total FROM aroma {$where}", $bindings)->total;
+
+        $data = DB::select("
+            SELECT arid, nama_aroma, kategori
+            FROM aroma
+            {$where}
+            ORDER BY nama_aroma ASC
+            LIMIT ? OFFSET ?
+        ", [...$bindings, $perPage, $offset]);
+
+        return ['data' => $data, 'total' => $total];
+    }
+
     public function find(int $arid): ?object
     {
         return DB::selectOne('
