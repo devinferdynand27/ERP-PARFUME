@@ -62,6 +62,17 @@ class PermintaanBarangController extends Controller
         ]);
     }
 
+    public function aromaData(Request $request)
+    {
+        $perPage = (int) $request->integer('per_page', 20);
+        $page = (int) $request->integer('page', 1);
+        $search = $request->string('search')->toString();
+
+        return response()->json(
+            $this->aromaRepository->paginateAktif($perPage, $page, $search !== '' ? $search : null)
+        );
+    }
+
     public function show(int $pbid)
     {
         $header = $this->permintaanBarangRepository->find($pbid);

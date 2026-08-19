@@ -7,6 +7,7 @@
         data-vue-component="PermintaanBarangForm"
         data-vue-props="{{ json_encode([
             'formOptionsUrl' => route('permintaan-barang.form-options'),
+            'aromaDataUrl' => route('permintaan-barang.aroma-data'),
             'storeUrl' => route('permintaan-barang.store'),
             'indexUrl' => route('permintaan-barang.index'),
         ]) }}"
