@@ -128,25 +128,45 @@ onMounted(() => {
                 </div>
                 <p v-if="formErrors.items" class="text-sm text-destructive">{{ formErrors.items[0] }}</p>
 
-                <div class="rounded-lg border border-border">
-                    <div v-for="(row, index) in formItems" :key="index" class="grid grid-cols-[1fr_1fr_100px_36px] gap-2 border-b border-border p-2 last:border-b-0">
-                        <Select v-model="row.arid">
-                            <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select v-model="row.stid">
-                            <SelectTrigger><SelectValue placeholder="Satuan" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem v-for="s in satuanOptions" :key="s.stid" :value="s.stid">{{ s.nama_satuan }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Input v-model="row.qty_diminta" type="number" min="0.01" step="0.01" placeholder="Qty" />
-                        <button type="button" class="flex items-center justify-center text-muted-foreground hover:text-destructive" @click="removeRow(index)">
-                            <Trash2 class="size-4" />
-                        </button>
-                    </div>
+                <div class="overflow-hidden rounded-lg border border-border">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-border bg-black text-left text-xs font-medium text-white">
+                                <th class="p-2 font-medium">Aroma</th>
+                                <th class="w-[140px] p-2 font-medium">Satuan</th>
+                                <th class="w-[120px] p-2 font-medium">Qty</th>
+                                <th class="w-9 p-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(row, index) in formItems" :key="index" class="border-b border-border last:border-b-0">
+                                <td class="p-2 align-top">
+                                    <Select v-model="row.arid">
+                                        <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </td>
+                                <td class="p-2 align-top">
+                                    <Select v-model="row.stid">
+                                        <SelectTrigger><SelectValue placeholder="Satuan" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="s in satuanOptions" :key="s.stid" :value="s.stid">{{ s.nama_satuan }}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </td>
+                                <td class="p-2 align-top">
+                                    <Input v-model="row.qty_diminta" type="number" min="0.01" step="0.01" placeholder="Qty" />
+                                </td>
+                                <td class="p-2 align-top">
+                                    <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" @click="removeRow(index)">
+                                        <Trash2 class="size-4" />
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <p v-if="formItems.length === 0" class="p-4 text-center text-sm text-muted-foreground">
                         Belum ada item, klik "Tambah Item".
                     </p>
