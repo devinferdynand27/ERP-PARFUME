@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 
 const props = defineProps({
     pbid: { type: [Number, String], default: null },
@@ -141,12 +142,14 @@ onMounted(() => {
                         <tbody>
                             <tr v-for="(row, index) in formItems" :key="index" class="border-b border-border last:border-b-0">
                                 <td class="p-2 align-top">
-                                    <Select v-model="row.arid">
-                                        <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Combobox
+                                        v-model="row.arid"
+                                        :options="aromaOptions"
+                                        option-value="arid"
+                                        option-label="nama_aroma"
+                                        placeholder="Pilih aroma"
+                                        empty-text="Aroma tidak ditemukan."
+                                    />
                                 </td>
                                 <td class="p-2 align-top">
                                     <Select v-model="row.stid">
