@@ -40,10 +40,11 @@ class DashboardRepository
 
         // 2. Daftar produk dengan stok kritis (Alert)
         $lowStockProducts = DB::select('
-            SELECT prid, kode_produk, nama_produk, stok, stok_minimum
-            FROM produk
-            WHERE aktif = 1 AND stok <= stok_minimum
-            ORDER BY stok ASC
+            SELECT p.prid, p.kode_produk, p.nama_produk, p.stok, p.stok_minimum, a.nama_aroma
+            FROM produk p
+            LEFT JOIN aroma a ON p.arid = a.arid
+            WHERE p.aktif = 1 AND p.stok <= p.stok_minimum
+            ORDER BY p.stok ASC
             LIMIT 5
         ');
 
