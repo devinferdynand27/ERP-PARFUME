@@ -33,7 +33,7 @@ const props = defineProps({
         required: true,
         default: () => []
     },
-    top_aromas: {
+    top_master_barang: {
         type: Array,
         required: true,
         default: () => []
@@ -108,26 +108,26 @@ const displayKPI = computed(() => {
     return props.kpi;
 });
 
-const displayAromas = computed(() => {
-    if (props.top_aromas && props.top_aromas.length > 0) {
-        return props.top_aromas.map(item => ({
-            nama_aroma: item.nama_aroma,
+const displayMasterBarang = computed(() => {
+    if (props.top_master_barang && props.top_master_barang.length > 0) {
+        return props.top_master_barang.map(item => ({
+            nama_barang: item.nama_barang,
             total_stok: Number(item.total_stok)
         }));
     }
     // Data demo chart sesuai dengan screenshot
     return [
-        { nama_aroma: 'Rose Elixir', total_stok: 100 },
-        { nama_aroma: 'Oud Noir', total_stok: 80 },
-        { nama_aroma: 'Jasmine Pearl', total_stok: 60 },
-        { nama_aroma: 'Lavender Pure', total_stok: 8 },
-        { nama_aroma: 'Vanilla Cream', total_stok: 120 },
-        { nama_aroma: 'Cedar Wood', total_stok: 45 }
+        { nama_barang: 'Rose Elixir', total_stok: 100 },
+        { nama_barang: 'Oud Noir', total_stok: 80 },
+        { nama_barang: 'Jasmine Pearl', total_stok: 60 },
+        { nama_barang: 'Lavender Pure', total_stok: 8 },
+        { nama_barang: 'Vanilla Cream', total_stok: 120 },
+        { nama_barang: 'Cedar Wood', total_stok: 45 }
     ];
 });
 
-const maxAromaStok = computed(() => {
-    const values = displayAromas.value.map(a => a.total_stok);
+const maxMasterBarangStok = computed(() => {
+    const values = displayMasterBarang.value.map(a => a.total_stok);
     return Math.max(...values, 120); // Skala grafik maksimal diset 120 sesuai screenshot
 });
 
@@ -154,7 +154,7 @@ const displayLowStockProducts = computed(() => {
             prid: 1,
             kode_produk: 'PRD-M3N405P6',
             nama_produk: '100ml - Premium - Lavender Pure',
-            nama_aroma: 'Lavender Pure',
+            nama_barang: 'Lavender Pure',
             stok: 8,
             stok_minimum: 10
         }
@@ -296,14 +296,14 @@ function refreshDashboard() {
 
                         <!-- Vertical Bars Group -->
                         <div class="flex-1 flex items-end justify-around h-full pl-10 pr-2 z-10">
-                            <div v-for="aroma in displayAromas" :key="aroma.nama_aroma" class="flex flex-col items-center group relative w-16">
+                            <div v-for="barang in displayMasterBarang" :key="barang.nama_barang" class="flex flex-col items-center group relative w-16">
                                 <!-- Hover Tooltip -->
                                 <div class="absolute -top-10 scale-0 group-hover:scale-100 transition-all duration-150 bg-[#0F172A] text-white text-[11px] px-2 py-1 rounded shadow-md pointer-events-none z-20 whitespace-nowrap font-medium">
-                                    {{ aroma.total_stok }} unit
+                                    {{ barang.total_stok }} unit
                                 </div>
                                 <!-- Bar Graphic -->
                                 <div class="w-[44px] bg-[#0F172A] hover:bg-[#1E293B] rounded-t-[4px] transition-all duration-300"
-                                     :style="{ height: `${(Number(aroma.total_stok) / maxAromaStok) * 90}%`, minHeight: '6px' }">
+                                     :style="{ height: `${(Number(barang.total_stok) / maxMasterBarangStok) * 90}%`, minHeight: '6px' }">
                                 </div>
                             </div>
                         </div>
@@ -311,8 +311,8 @@ function refreshDashboard() {
 
                     <!-- X-Axis Labels -->
                     <div class="flex justify-around pl-10 pr-2 pt-3 text-[11px] font-semibold text-[#64748B]">
-                        <span v-for="aroma in displayAromas" :key="aroma.nama_aroma" class="w-16 text-center truncate" :title="aroma.nama_aroma">
-                            {{ aroma.nama_aroma }}
+                        <span v-for="barang in displayMasterBarang" :key="barang.nama_barang" class="w-16 text-center truncate" :title="barang.nama_barang">
+                            {{ barang.nama_barang }}
                         </span>
                     </div>
                 </CardContent>
@@ -372,7 +372,7 @@ function refreshDashboard() {
                     <TableHeader>
                         <TableRow class="bg-[#F8FAFC] border-b border-[#E2E8F0] hover:bg-[#F8FAFC]">
                             <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5 pl-6">Produk</TableHead>
-                            <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Aroma</TableHead>
+                            <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Barang</TableHead>
                             <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Ukuran</TableHead>
                             <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Kualitas</TableHead>
                             <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Stok</TableHead>
@@ -398,7 +398,7 @@ function refreshDashboard() {
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell class="font-medium text-sm text-[#334155]">{{ prod.nama_aroma ?? parseProductDetails(prod.nama_produk).aroma }}</TableCell>
+                            <TableCell class="font-medium text-sm text-[#334155]">{{ prod.nama_barang ?? parseProductDetails(prod.nama_produk).aroma }}</TableCell>
                             <TableCell class="font-medium text-sm text-[#334155]">{{ parseProductDetails(prod.nama_produk).ukuran }}</TableCell>
                             <TableCell class="font-medium text-sm text-[#334155]">{{ parseProductDetails(prod.nama_produk).kualitas }}</TableCell>
                             <!-- Stok with colored status dot indicator -->

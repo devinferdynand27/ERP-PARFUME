@@ -26,7 +26,7 @@ return [
     ],
 
     'attributes' => [
-        'nama_aroma' => 'nama aroma',
+        'nama_barang' => 'nama barang',
         'kategori' => 'kategori',
         'ukuran' => 'ukuran botol',
         'kualitas' => 'kualitas bibit',
@@ -35,7 +35,7 @@ return [
         'alamat' => 'alamat',
         'kode_produk' => 'kode produk',
         'nama_produk' => 'nama produk',
-        'arid' => 'aroma',
+        'mbid' => 'barang',
         'harga_beli_default' => 'harga beli default',
         'harga_jual_default' => 'harga jual default',
         'stok' => 'stok',

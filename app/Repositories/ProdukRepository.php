@@ -10,9 +10,9 @@ class ProdukRepository
     {
         return DB::select('
             SELECT p.prid, p.kode_produk, p.nama_produk, p.stok, p.stok_minimum,
-                   p.harga_beli_default, p.harga_jual_default, a.nama_aroma
+                   p.harga_beli_default, p.harga_jual_default, mb.nama_barang
             FROM produk p
-            JOIN aroma a ON a.arid = p.arid
+            JOIN master_barang mb ON mb.mbid = p.mbid
             WHERE p.aktif = 1
             ORDER BY p.nama_produk ASC
         ');
@@ -24,7 +24,7 @@ class ProdukRepository
      * dipakai untuk dropdown di form lain (mis. pemilihan produk saat input
      * barang masuk/keluar).
      */
-    public function paginate(int $perPage, int $page, ?string $search = null, ?int $arid = null): array
+    public function paginate(int $perPage, int $page, ?string $search = null, ?int $mbid = null): array
     {
         $offset = ($page - 1) * $perPage;
         $where = 'WHERE 1 = 1';
@@ -36,9 +36,9 @@ class ProdukRepository
             $bindings[] = "%{$search}%";
         }
 
-        if ($arid !== null) {
-            $where .= ' AND p.arid = ?';
-            $bindings[] = $arid;
+        if ($mbid !== null) {
+            $where .= ' AND p.mbid = ?';
+            $bindings[] = $mbid;
         }
 
         $total = DB::selectOne("
@@ -46,11 +46,11 @@ class ProdukRepository
         ", $bindings)->total;
 
         $data = DB::select("
-            SELECT p.prid, p.kode_produk, p.nama_produk, p.arid, a.nama_aroma,
+            SELECT p.prid, p.kode_produk, p.nama_produk, p.mbid, mb.nama_barang,
                    p.stok, p.stok_minimum,
                    p.harga_beli_default, p.harga_jual_default, p.aktif
             FROM produk p
-            JOIN aroma a ON a.arid = p.arid
+            JOIN master_barang mb ON mb.mbid = p.mbid
             {$where}
             ORDER BY p.nama_produk ASC
             LIMIT ? OFFSET ?
@@ -62,11 +62,11 @@ class ProdukRepository
     public function find(int $prid): ?object
     {
         return DB::selectOne('
-            SELECT p.prid, p.kode_produk, p.nama_produk, p.arid, a.nama_aroma,
+            SELECT p.prid, p.kode_produk, p.nama_produk, p.mbid, mb.nama_barang,
                    p.harga_beli_default, p.harga_jual_default,
                    p.stok, p.stok_minimum, p.aktif
             FROM produk p
-            JOIN aroma a ON a.arid = p.arid
+            JOIN master_barang mb ON mb.mbid = p.mbid
             WHERE p.prid = ?
         ', [$prid]);
     }
@@ -136,14 +136,14 @@ class ProdukRepository
     {
         DB::insert('
             INSERT INTO produk (
-                kode_produk, nama_produk, arid,
+                kode_produk, nama_produk, mbid,
                 harga_beli_default, harga_jual_default,
                 stok, stok_minimum, aktif, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
         ', [
             $data['kode_produk'],
             $data['nama_produk'],
-            $data['arid'],
+            $data['mbid'],
             $data['harga_beli_default'],
             $data['harga_jual_default'],
             $data['stok'] ?? 0,
@@ -157,12 +157,12 @@ class ProdukRepository
     {
         return DB::update('
             UPDATE produk
-            SET nama_produk = ?, arid = ?, harga_beli_default = ?,
+            SET nama_produk = ?, mbid = ?, harga_beli_default = ?,
                 harga_jual_default = ?, stok_minimum = ?, updated_at = NOW()
             WHERE prid = ?
         ', [
             $data['nama_produk'],
-            $data['arid'],
+            $data['mbid'],
             $data['harga_beli_default'],
             $data['harga_jual_default'],
             $data['stok_minimum'] ?? 0,

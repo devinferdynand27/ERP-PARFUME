@@ -21,7 +21,7 @@ const loading = ref(true);
 const saving = ref(false);
 const errorMessage = ref('');
 
-const aromaOptions = ref([]);
+const masterBarangOptions = ref([]);
 const satuanOptions = ref([]);
 const supplierOptions = ref([]);
 const permintaanDisetujui = ref([]);
@@ -50,7 +50,7 @@ const previewTotal = computed(() => formItems.value.reduce(
 
 function addRow() {
     formItems.value.push({
-        pbdid: null, arid: null, stid: null, qty_dipesan: 1, harga_satuan: 0,
+        pbdid: null, mbid: null, stid: null, qty_dipesan: 1, harga_satuan: 0,
     });
 }
 
@@ -64,7 +64,7 @@ async function load() {
         http.get(props.formOptionsUrl),
         http.get(`${props.permintaanBarangDataUrl}?status=disetujui&per_page=1000`),
     ]);
-    aromaOptions.value = options.aroma;
+    masterBarangOptions.value = options.master_barang;
     satuanOptions.value = options.satuan;
     supplierOptions.value = options.supplier;
     permintaanDisetujui.value = prResult.data;
@@ -77,7 +77,7 @@ watch(selectedPbid, async (pbid) => {
     const result = await http.get(buildUrl(props.dariPermintaanUrlTemplate, pbid));
     formItems.value = result.items.map((i) => ({
         pbdid: i.pbdid,
-        arid: i.arid,
+        mbid: i.mbid,
         stid: i.stid,
         qty_dipesan: Number(i.qty_diminta),
         harga_satuan: 0,
@@ -177,7 +177,7 @@ onMounted(() => {
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-border bg-muted/50 text-left text-xs font-medium text-foreground">
-                                <th class="p-2 font-medium">Aroma</th>
+                                <th class="p-2 font-medium">Barang</th>
                                 <th class="w-[110px] p-2 font-medium">Satuan</th>
                                 <th class="w-[110px] p-2 font-medium">Qty</th>
                                 <th class="w-[150px] p-2 font-medium">Harga Satuan</th>
@@ -187,10 +187,10 @@ onMounted(() => {
                         <tbody>
                             <tr v-for="(row, index) in formItems" :key="index" class="border-b border-border last:border-b-0">
                                 <td class="p-2 align-top">
-                                    <Select v-model="row.arid" :disabled="selectedPbid !== 'none'">
-                                        <SelectTrigger><SelectValue placeholder="Pilih aroma" /></SelectTrigger>
+                                    <Select v-model="row.mbid" :disabled="selectedPbid !== 'none'">
+                                        <SelectTrigger><SelectValue placeholder="Pilih barang" /></SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">{{ a.nama_aroma }}</SelectItem>
+                                            <SelectItem v-for="a in masterBarangOptions" :key="a.mbid" :value="a.mbid">{{ a.nama_barang }}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </td>
