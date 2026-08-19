@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import {
     Pencil, Trash2, Search, Download, ChevronDown,
 } from '@lucide/vue';
@@ -50,11 +50,9 @@ const loading = ref(false);
 const errorMessage = ref('');
 
 const aromaOptions = ref([]);
-const ukuranOptions = ref([]);
 
 const dialogOpen = ref(false);
 const editingPrid = ref(null);
-const selectedUkuran = ref('');
 const form = reactive({
     nama_produk: '',
     arid: null,
@@ -94,25 +92,11 @@ async function loadData() {
 async function loadFormOptions() {
     const result = await http.get(props.formOptionsUrl);
     aromaOptions.value = result.aroma;
-    ukuranOptions.value = result.ukuran_botol;
     return result;
 }
 
-const selectedAromaNama = computed(() => {
-    const found = aromaOptions.value.find((a) => a.arid === form.arid);
-    return found?.nama_aroma ?? '';
-});
-
-watch([selectedUkuran, () => form.arid], () => {
-    if (editingPrid.value) return;
-    if (selectedUkuran.value && selectedAromaNama.value) {
-        form.nama_produk = `${selectedUkuran.value} - ${selectedAromaNama.value}`;
-    }
-});
-
 async function openCreate() {
     editingPrid.value = null;
-    selectedUkuran.value = '';
     form.nama_produk = '';
     form.arid = null;
     form.harga_beli_default = '';
@@ -126,7 +110,6 @@ async function openCreate() {
 
 async function openEdit(item) {
     editingPrid.value = item.prid;
-    selectedUkuran.value = '';
     form.nama_produk = item.nama_produk;
     form.arid = item.arid;
     form.harga_beli_default = item.harga_beli_default;
@@ -351,39 +334,24 @@ onMounted(() => {
                     <DialogTitle>{{ editingPrid ? 'Edit Produk' : 'Tambah Produk' }}</DialogTitle>
                 </DialogHeader>
                 <form class="space-y-4" @submit.prevent="submitForm">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <Label>Ukuran Botol</Label>
-                            <Select v-model="selectedUkuran">
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Pilih ukuran" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="u in ukuranOptions" :key="u.ubid" :value="u.ukuran">
-                                        {{ u.ukuran }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div class="space-y-2">
-                            <Label>Aroma</Label>
-                            <Select v-model="form.arid">
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Pilih aroma" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">
-                                        {{ a.nama_aroma }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p v-if="formErrors.arid" class="text-sm text-destructive">{{ formErrors.arid[0] }}</p>
-                        </div>
+                    <div class="space-y-2">
+                        <Label>Aroma</Label>
+                        <Select v-model="form.arid">
+                            <SelectTrigger class="w-full">
+                                <SelectValue placeholder="Pilih aroma" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="a in aromaOptions" :key="a.arid" :value="a.arid">
+                                    {{ a.nama_aroma }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="formErrors.arid" class="text-sm text-destructive">{{ formErrors.arid[0] }}</p>
                     </div>
 
                     <div class="space-y-2">
                         <Label for="nama_produk">Nama Produk</Label>
-                        <Input id="nama_produk" v-model="form.nama_produk" placeholder="Tersusun otomatis, bisa diedit" />
+                        <Input id="nama_produk" v-model="form.nama_produk" placeholder="Nama produk" />
                         <p v-if="formErrors.nama_produk" class="text-sm text-destructive">
                             {{ formErrors.nama_produk[0] }}
                         </p>

@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import {
-    LayoutDashboard, Package, Ruler, FlaskConical, Truck, Scale,
+    LayoutDashboard, Package, FlaskConical, Truck, Scale,
+    ClipboardList, ShoppingCart, PackageCheck,
 } from '@lucide/vue';
 
 const props = defineProps({
@@ -27,11 +28,15 @@ const menu = [
 
 const masterData = [
     { key: 'produk', label: 'Master Produk', icon: Package, urlKey: 'produk' },
-    { key: 'ukuran-botol', label: 'Master Ukuran Botol', icon: Ruler, urlKey: 'ukuranBotol' },
-    { key: 'kualitas-bibit', label: 'Master Kualitas Bibit', icon: FlaskConical, urlKey: 'kualitasBibit' },
     { key: 'supplier', label: 'Master Supplier', icon: Truck, urlKey: 'supplier' },
     { key: 'aroma', label: 'Master Aroma', icon: FlaskConical, urlKey: 'aroma' },
     { key: 'satuan', label: 'Master Satuan', icon: Scale, urlKey: 'satuan' },
+];
+
+const transaksi = [
+    { key: 'permintaan-barang', label: 'Permintaan Barang', icon: ClipboardList, urlKey: 'permintaanBarang' },
+    { key: 'pesanan-pembelian', label: 'Pesanan Pembelian', icon: ShoppingCart, urlKey: 'pesananPembelian' },
+    { key: 'penerimaan-barang', label: 'Penerimaan Barang', icon: PackageCheck, urlKey: 'penerimaanBarang' },
 ];
 </script>
 
@@ -61,6 +66,20 @@ const masterData = [
             </div>
             <a
                 v-for="item in masterData"
+                :key="item.key"
+                :href="urls[item.urlKey]"
+                class="flex items-center gap-3 rounded-md px-3 py-2 font-medium transition-colors"
+                :class="active === item.key ? 'bg-foreground text-background' : 'text-foreground hover:bg-accent'"
+            >
+                <component :is="item.icon" class="size-4" />
+                {{ item.label }}
+            </a>
+
+            <div class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Transaksi
+            </div>
+            <a
+                v-for="item in transaksi"
                 :key="item.key"
                 :href="urls[item.urlKey]"
                 class="flex items-center gap-3 rounded-md px-3 py-2 font-medium transition-colors"
