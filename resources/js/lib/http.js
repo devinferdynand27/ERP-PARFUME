@@ -28,4 +28,5 @@ export const http = {
     post: (url, data) => request(url, { method: 'POST', body: JSON.stringify(data) }),
     put: (url, data) => request(url, { method: 'PUT', body: JSON.stringify(data) }),
     patch: (url, data) => request(url, { method: 'PATCH', body: data ? JSON.stringify(data) : undefined }),
+    delete: (url) => request(url, { method: 'DELETE' }),
 };

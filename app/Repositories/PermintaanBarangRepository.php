@@ -135,4 +135,11 @@ class PermintaanBarangRepository
             WHERE pbid = ?
         ', [$status, $adid, $pbid]) > 0;
     }
+
+    public function delete(int $pbid): bool
+    {
+        DB::delete('DELETE FROM permintaan_barang_detail WHERE pbid = ?', [$pbid]);
+
+        return DB::delete('DELETE FROM permintaan_barang WHERE pbid = ?', [$pbid]) > 0;
+    }
 }

@@ -61,10 +61,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/aroma-data', [PermintaanBarangController::class, 'aromaData'])->name('aroma-data');
         Route::get('/create', [PermintaanBarangController::class, 'create'])->name('create');
         Route::get('/{pbid}/edit', [PermintaanBarangController::class, 'edit'])->name('edit');
+        Route::get('/{pbid}/print', [PermintaanBarangController::class, 'print'])->name('print');
         Route::get('/{pbid}', [PermintaanBarangController::class, 'show'])->name('show');
         Route::post('/', [PermintaanBarangController::class, 'store'])->name('store');
         Route::put('/{pbid}', [PermintaanBarangController::class, 'update'])->name('update');
         Route::patch('/{pbid}/status', [PermintaanBarangController::class, 'updateStatus'])->name('status');
+        Route::delete('/{pbid}', [PermintaanBarangController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('transaksi/pesanan-pembelian')->name('pesanan-pembelian.')->group(function () {
