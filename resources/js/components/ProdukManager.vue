@@ -71,6 +71,13 @@ function formatRupiah(value) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 }
 
+function getAvatarInitial(name) {
+    if (!name) return 'P';
+    const parts = name.split(' - ');
+    const aromaName = parts[parts.length - 1];
+    return aromaName.trim().charAt(0).toUpperCase();
+}
+
 async function loadData() {
     loading.value = true;
     errorMessage.value = '';
@@ -94,6 +101,20 @@ async function loadFormOptions() {
     aromaOptions.value = result.aroma;
     return result;
 }
+
+const selectedAromaNama = computed(() => {
+    const found = aromaOptions.value.find((a) => a.arid === form.arid);
+    return found?.nama_aroma ?? '';
+});
+
+const totalPages = computed(() => Math.ceil(total.value / perPage) || 1);
+
+watch([selectedUkuran, () => form.arid], () => {
+    if (editingPrid.value) return;
+    if (selectedUkuran.value && selectedAromaNama.value) {
+        form.nama_produk = `${selectedUkuran.value} - ${selectedAromaNama.value}`;
+    }
+});
 
 async function openCreate() {
     editingPrid.value = null;
@@ -255,13 +276,13 @@ onMounted(() => {
 
             <Table>
                 <TableHeader>
-                    <TableRow>
-                        <TableHead class="uppercase tracking-wide text-xs">Produk</TableHead>
-                        <TableHead class="uppercase tracking-wide text-xs">Aroma</TableHead>
-                        <TableHead class="uppercase tracking-wide text-xs">Harga Modal</TableHead>
-                        <TableHead class="uppercase tracking-wide text-xs">Harga Jual</TableHead>
-                        <TableHead class="uppercase tracking-wide text-xs">Stok</TableHead>
-                        <TableHead class="text-right uppercase tracking-wide text-xs">Aksi</TableHead>
+                    <TableRow class="bg-[#F8FAFC] border-b border-[#E2E8F0] hover:bg-[#F8FAFC]">
+                        <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5 pl-6">Produk</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Aroma</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Harga Modal</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Harga Jual</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5">Stok</TableHead>
+                        <TableHead class="text-right uppercase tracking-wide text-xs text-[#64748B] font-semibold py-3.5 pr-6">Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -271,44 +292,46 @@ onMounted(() => {
                     <TableEmpty v-else-if="items.length === 0" :colspan="6">
                         Belum ada data produk.
                     </TableEmpty>
-                    <TableRow v-for="item in items" :key="item.prid">
-                        <TableCell>
+                    <TableRow v-for="item in items" :key="item.prid" class="border-b border-[#F1F5F9] hover:bg-[#F8FAFC] transition-colors">
+                        <TableCell class="pl-6 py-4">
                             <div class="flex items-center gap-3">
-                                <Avatar class="size-9 rounded-lg">
-                                    <AvatarFallback :class="['rounded-lg font-semibold', colorFor(item.nama_produk)]">
-                                        {{ initialOf(item.nama_produk) }}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <!-- Solid Dark Circle Initial Avatar per ui.md -->
+                                <div class="size-9 rounded-lg bg-[#0F172A] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                                    {{ getAvatarInitial(item.nama_produk) }}
+                                </div>
                                 <div>
-                                    <div class="font-medium">{{ item.nama_produk }}</div>
-                                    <div class="font-mono text-xs text-muted-foreground">{{ item.kode_produk }}</div>
+                                    <div class="font-semibold text-sm text-[#0F172A]">{{ item.nama_produk }}</div>
+                                    <div class="font-mono text-[11px] text-[#94A3B8] mt-0.5">{{ item.kode_produk }}</div>
                                 </div>
                             </div>
                         </TableCell>
-                        <TableCell>{{ item.nama_aroma }}</TableCell>
-                        <TableCell class="font-mono">{{ formatRupiah(item.harga_beli_default) }}</TableCell>
-                        <TableCell class="font-mono font-medium">{{ formatRupiah(item.harga_jual_default) }}</TableCell>
+                        <TableCell class="font-medium text-sm text-[#334155]">{{ item.nama_aroma }}</TableCell>
+                        <TableCell class="font-mono text-sm text-[#334155]">{{ formatRupiah(item.harga_beli_default) }}</TableCell>
+                        <TableCell class="font-mono font-bold text-sm text-[#0F172A]">{{ formatRupiah(item.harga_jual_default) }}</TableCell>
+                        <!-- Stock Status Badge (compact rounded-[6px]) -->
                         <TableCell>
-                            <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
-                                :class="item.stok <= item.stok_minimum ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'"
+                            <span class="px-2 py-0.5 rounded-[6px] font-semibold text-xs inline-flex items-center gap-1.5"
+                                :class="item.stok <= item.stok_minimum ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#DCFCE7] text-[#15803D]'"
                             >
-                                <span class="size-1.5 rounded-full" :class="item.stok <= item.stok_minimum ? 'bg-rose-500' : 'bg-emerald-500'" />
+                                <span class="size-1.5 rounded-full" :class="item.stok <= item.stok_minimum ? 'bg-[#EF4444]' : 'bg-[#22C55E]'" />
                                 {{ item.stok }}
                             </span>
                         </TableCell>
-                        <TableCell class="text-right">
+                        <TableCell class="text-right pr-6">
                             <div class="flex justify-end gap-2">
                                 <button
                                     type="button"
-                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    class="flex size-8 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#64748B] transition-colors hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
                                     @click="openEdit(item)"
+                                    aria-label="Edit product"
                                 >
                                     <Pencil class="size-4" />
                                 </button>
                                 <button
                                     type="button"
-                                    class="flex size-8 items-center justify-center rounded-md bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90"
+                                    class="flex size-8 items-center justify-center rounded-lg bg-red-600 text-white transition-colors hover:bg-red-700 cursor-pointer"
                                     @click="nonaktifkan(item)"
+                                    aria-label="Delete product"
                                 >
                                     <Trash2 class="size-4" />
                                 </button>
@@ -318,12 +341,24 @@ onMounted(() => {
                 </TableBody>
             </Table>
 
-            <div class="flex items-center justify-between border-t border-border p-4 text-sm text-muted-foreground">
-                <span>Menampilkan {{ items.length }} dari {{ total }}</span>
-                <div class="space-x-2">
-                    <Button variant="outline" size="sm" :disabled="page <= 1" @click="page--">‹</Button>
-                    <span class="px-2">{{ page }}</span>
-                    <Button variant="outline" size="sm" :disabled="page * perPage >= total" @click="page++">›</Button>
+            <div class="flex items-center justify-between border-t border-[#E2E8F0] p-4 text-xs font-medium text-[#64748B] select-none bg-white rounded-b-xl">
+                <span>Menampilkan 1-{{ items.length }} dari {{ total }}</span>
+                <div class="flex items-center gap-1.5">
+                    <Button variant="outline" class="size-8 p-0 border-[#E2E8F0] rounded-lg" :disabled="page <= 1" @click="page--">
+                        ‹
+                    </Button>
+                    <Button v-for="p in totalPages" :key="p" 
+                            :variant="page === p ? 'default' : 'outline'" 
+                            class="size-8 p-0 rounded-lg text-xs font-semibold"
+                            :class="page === p 
+                                ? 'bg-[#050505] text-white hover:bg-[#171717]' 
+                                : 'border-[#E2E8F0] text-[#334155] hover:bg-slate-50'"
+                            @click="page = p">
+                        {{ p }}
+                    </Button>
+                    <Button variant="outline" class="size-8 p-0 border-[#E2E8F0] rounded-lg" :disabled="page * perPage >= total" @click="page++">
+                        ›
+                    </Button>
                 </div>
             </div>
         </div>
