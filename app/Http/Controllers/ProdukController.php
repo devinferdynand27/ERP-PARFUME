@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\AromaRepository;
 use App\Repositories\ProdukRepository;
-use App\Repositories\UkuranBotolRepository;
 use Illuminate\Http\Request;
 
 class ProdukController extends Controller
@@ -12,7 +11,6 @@ class ProdukController extends Controller
     public function __construct(
         private ProdukRepository $produkRepository,
         private AromaRepository $aromaRepository,
-        private UkuranBotolRepository $ukuranBotolRepository,
     ) {
     }
 
@@ -37,7 +35,6 @@ class ProdukController extends Controller
     {
         return response()->json([
             'aroma' => $this->aromaRepository->getAktif(),
-            'ukuran_botol' => $this->ukuranBotolRepository->getAktif(),
             'kode_produk_berikutnya' => $this->produkRepository->generateKodeProduk(),
         ]);
     }

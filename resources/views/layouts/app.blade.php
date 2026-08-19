@@ -17,11 +17,12 @@
                 'urls' => [
                     'dashboard' => url('/'),
                     'produk' => route('produk.index'),
-                    'ukuranBotol' => route('ukuran-botol.index'),
-                    'kualitasBibit' => route('kualitas-bibit.index'),
                     'supplier' => route('supplier.index'),
                     'aroma' => route('aroma.index'),
                     'satuan' => route('satuan.index'),
+                    'permintaanBarang' => route('permintaan-barang.index'),
+                    'pesananPembelian' => route('pesanan-pembelian.index'),
+                    'penerimaanBarang' => route('penerimaan-barang.index'),
                 ],
             ]) }}"
         ></div>
