@@ -13,6 +13,7 @@
             data-vue-component="AppSidebar"
             data-vue-props="{{ json_encode([
                 'active' => explode('.', request()->route()?->getName() ?? '')[0] ?? '',
+                'userRole' => auth()->user()?->role ?? 'guest',
                 'urls' => [
                     'dashboard' => url('/'),
                     'produk' => route('produk.index'),
@@ -26,7 +27,14 @@
         ></div>
 
         <div class="flex flex-1 flex-col">
-            <div data-vue-component="AppHeader"></div>
+            <div 
+                data-vue-component="AppHeader"
+                data-vue-props="{{ json_encode([
+                    'userName' => auth()->user()?->nama_admin ?? 'Pengguna',
+                    'userRole' => auth()->user()?->role ?? 'guest',
+                    'logoutUrl' => route('logout'),
+                ]) }}"
+            ></div>
 
             <main
                 data-page-content

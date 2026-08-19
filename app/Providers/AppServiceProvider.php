@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Auth::provider('admin_provider', function ($app, array $config) {
+            return new \App\Auth\AdminUserProvider($app->make(\App\Repositories\AdminRepository::class));
+        });
     }
 }
