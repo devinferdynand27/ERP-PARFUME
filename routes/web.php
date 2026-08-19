@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AromaController;
+use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\PermintaanBarangController;
 use App\Http\Controllers\PesananPembelianController;
@@ -26,13 +26,13 @@ Route::middleware('auth')->group(function () {
 
     // Rute Khusus Admin - Master Data (RBAC)
     Route::middleware('role:admin')->group(function () {
-        // Master Aroma
-        Route::prefix('master/aroma')->name('aroma.')->group(function () {
-            Route::get('/', [AromaController::class, 'index'])->name('index');
-            Route::get('/data', [AromaController::class, 'data'])->name('data');
-            Route::post('/', [AromaController::class, 'store'])->name('store');
-            Route::put('/{arid}', [AromaController::class, 'update'])->name('update');
-            Route::patch('/{arid}/toggle-aktif', [AromaController::class, 'toggleAktif'])->name('toggle-aktif');
+        // Master Barang
+        Route::prefix('master/master-barang')->name('master-barang.')->group(function () {
+            Route::get('/', [MasterBarangController::class, 'index'])->name('index');
+            Route::get('/data', [MasterBarangController::class, 'data'])->name('data');
+            Route::post('/', [MasterBarangController::class, 'store'])->name('store');
+            Route::put('/{mbid}', [MasterBarangController::class, 'update'])->name('update');
+            Route::patch('/{mbid}/toggle-aktif', [MasterBarangController::class, 'toggleAktif'])->name('toggle-aktif');
         });
 
         // Master Supplier
@@ -58,7 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [PermintaanBarangController::class, 'index'])->name('index');
         Route::get('/data', [PermintaanBarangController::class, 'data'])->name('data');
         Route::get('/form-options', [PermintaanBarangController::class, 'formOptions'])->name('form-options');
-        Route::get('/aroma-data', [PermintaanBarangController::class, 'aromaData'])->name('aroma-data');
+        Route::get('/master-barang-data', [PermintaanBarangController::class, 'masterBarangData'])->name('master-barang-data');
         Route::get('/create', [PermintaanBarangController::class, 'create'])->name('create');
         Route::get('/{pbid}/edit', [PermintaanBarangController::class, 'edit'])->name('edit');
         Route::get('/{pbid}/print', [PermintaanBarangController::class, 'print'])->name('print');

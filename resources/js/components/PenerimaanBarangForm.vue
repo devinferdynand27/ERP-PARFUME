@@ -135,7 +135,7 @@ onMounted(() => {
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-border bg-muted/50 text-left text-xs font-medium text-foreground">
-                                <th class="p-2 font-medium">Aroma</th>
+                                <th class="p-2 font-medium">Barang</th>
                                 <th class="w-[110px] p-2 font-medium">Sisa PO</th>
                                 <th class="w-[120px] p-2 font-medium">Qty Diterima</th>
                                 <th class="w-[90px] p-2 font-medium">Satuan</th>
@@ -143,7 +143,7 @@ onMounted(() => {
                         </thead>
                         <tbody>
                             <tr v-for="row in sisaItems" :key="row.ppdid" class="border-b border-border last:border-b-0">
-                                <td class="p-2 align-middle text-sm font-medium">{{ row.nama_aroma }}</td>
+                                <td class="p-2 align-middle text-sm font-medium">{{ row.nama_barang }}</td>
                                 <td class="p-2 align-middle text-muted-foreground">{{ row.sisa }} {{ row.nama_satuan }}</td>
                                 <td class="p-2 align-middle">
                                     <Input v-model="qtyInput[row.ppdid]" type="number" min="0" :max="row.sisa" step="0.01" placeholder="Qty" />

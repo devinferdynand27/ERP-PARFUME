@@ -58,10 +58,10 @@ class PesananPembelianRepository
     public function getItems(int $ppid): array
     {
         return DB::select('
-            SELECT d.ppdid, d.ppid, d.pbdid, d.arid, a.nama_aroma,
+            SELECT d.ppdid, d.ppid, d.pbdid, d.mbid, mb.nama_barang,
                 d.stid, s.nama_satuan, d.qty_dipesan, d.qty_diterima, d.harga_satuan, d.subtotal
             FROM pesanan_pembelian_detail d
-            JOIN aroma a ON a.arid = d.arid
+            JOIN master_barang mb ON mb.mbid = d.mbid
             JOIN satuan s ON s.stid = d.stid
             WHERE d.ppid = ?
             ORDER BY d.ppdid ASC
@@ -75,11 +75,11 @@ class PesananPembelianRepository
     public function getItemsWithSisa(int $ppid): array
     {
         return DB::select('
-            SELECT d.ppdid, d.arid, a.nama_aroma,
+            SELECT d.ppdid, d.mbid, mb.nama_barang,
                 d.stid, s.nama_satuan, d.qty_dipesan, d.qty_diterima, d.harga_satuan,
                 (d.qty_dipesan - d.qty_diterima) AS sisa
             FROM pesanan_pembelian_detail d
-            JOIN aroma a ON a.arid = d.arid
+            JOIN master_barang mb ON mb.mbid = d.mbid
             JOIN satuan s ON s.stid = d.stid
             WHERE d.ppid = ? AND d.qty_dipesan > d.qty_diterima
             ORDER BY d.ppdid ASC
@@ -144,12 +144,12 @@ class PesananPembelianRepository
             $subtotal = $item['qty_dipesan'] * $item['harga_satuan'];
 
             DB::insert('
-                INSERT INTO pesanan_pembelian_detail (ppid, pbdid, arid, stid, qty_dipesan, harga_satuan, subtotal)
+                INSERT INTO pesanan_pembelian_detail (ppid, pbdid, mbid, stid, qty_dipesan, harga_satuan, subtotal)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ', [
                 $ppid,
                 $item['pbdid'] ?? null,
-                $item['arid'],
+                $item['mbid'],
                 $item['stid'],
                 $item['qty_dipesan'],
                 $item['harga_satuan'],
@@ -177,7 +177,7 @@ class PesananPembelianRepository
     public function getDetailForUpdate(int $ppdid): ?object
     {
         return DB::selectOne('
-            SELECT ppdid, ppid, arid, qty_dipesan, qty_diterima
+            SELECT ppdid, ppid, mbid, qty_dipesan, qty_diterima
             FROM pesanan_pembelian_detail
             WHERE ppdid = ?
             FOR UPDATE

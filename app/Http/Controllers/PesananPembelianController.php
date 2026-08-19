@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\AromaRepository;
+use App\Repositories\MasterBarangRepository;
 use App\Repositories\PermintaanBarangRepository;
 use App\Repositories\PesananPembelianRepository;
 use App\Repositories\SatuanRepository;
@@ -15,7 +15,7 @@ class PesananPembelianController extends Controller
     public function __construct(
         private PesananPembelianRepository $pesananPembelianRepository,
         private PermintaanBarangRepository $permintaanBarangRepository,
-        private AromaRepository $aromaRepository,
+        private MasterBarangRepository $masterBarangRepository,
         private SatuanRepository $satuanRepository,
         private SupplierRepository $supplierRepository,
     ) {
@@ -51,7 +51,7 @@ class PesananPembelianController extends Controller
     public function formOptions()
     {
         return response()->json([
-            'aroma' => $this->aromaRepository->getAktif(),
+            'master_barang' => $this->masterBarangRepository->getAktif(),
             'satuan' => $this->satuanRepository->getAktif(),
             'supplier' => $this->supplierRepository->getAktif(),
             'nomor_po_berikutnya' => $this->pesananPembelianRepository->generateNomorPO(),
@@ -87,7 +87,7 @@ class PesananPembelianController extends Controller
             'catatan' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.pbdid' => ['nullable', 'integer', 'exists:permintaan_barang_detail,pbdid'],
-            'items.*.arid' => ['required', 'integer', 'exists:aroma,arid'],
+            'items.*.mbid' => ['required', 'integer', 'exists:master_barang,mbid'],
             'items.*.stid' => ['required', 'integer', 'exists:satuan,stid'],
             'items.*.qty_dipesan' => ['required', 'numeric', 'min:0.01'],
             'items.*.harga_satuan' => ['required', 'numeric', 'min:0'],

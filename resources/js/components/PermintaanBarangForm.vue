@@ -16,7 +16,7 @@ import {
 const props = defineProps({
     pbid: { type: [Number, String], default: null },
     formOptionsUrl: { type: String, required: true },
-    aromaDataUrl: { type: String, required: true },
+    masterBarangDataUrl: { type: String, required: true },
     showUrl: { type: String, default: null },
     storeUrl: { type: String, default: null },
     updateUrl: { type: String, default: null },
@@ -25,7 +25,7 @@ const props = defineProps({
 
 const isEdit = !!props.pbid;
 
-const aromaOptions = ref([]);
+const masterBarangOptions = ref([]);
 const satuanOptions = ref([]);
 const loading = ref(true);
 const saving = ref(false);
@@ -39,7 +39,7 @@ const formItems = ref([]);
 const formErrors = ref({});
 
 function addRow() {
-    formItems.value.push({ arid: null, stid: null, qty_diminta: 1 });
+    formItems.value.push({ mbid: null, stid: null, qty_diminta: 1 });
 }
 
 function removeRow(index) {
@@ -58,7 +58,7 @@ async function loadAllBarang() {
     allBarangLoading.value = true;
     const params = new URLSearchParams({ page: allBarangPage.value, per_page: allBarangPerPage });
     if (allBarangSearch.value) params.set('search', allBarangSearch.value);
-    const result = await http.get(`${props.aromaDataUrl}?${params}`);
+    const result = await http.get(`${props.masterBarangDataUrl}?${params}`);
     allBarangResults.value = result.data;
     allBarangTotal.value = result.total;
     allBarangLoading.value = false;
@@ -81,14 +81,14 @@ function openAllBarangDialog() {
     loadAllBarang();
 }
 
-function addRowFromDialog(arid) {
-    formItems.value.push({ arid, stid: null, qty_diminta: 1 });
+function addRowFromDialog(mbid) {
+    formItems.value.push({ mbid, stid: null, qty_diminta: 1 });
 }
 
 async function load() {
     loading.value = true;
     const options = await http.get(props.formOptionsUrl);
-    aromaOptions.value = options.aroma;
+    masterBarangOptions.value = options.master_barang;
     satuanOptions.value = options.satuan;
 
     if (isEdit) {
@@ -96,7 +96,7 @@ async function load() {
         form.tanggal = detail.header.tanggal;
         form.catatan = detail.header.catatan ?? '';
         formItems.value = detail.items.map((i) => ({
-            arid: i.arid, stid: i.stid, qty_diminta: Number(i.qty_diminta),
+            mbid: i.mbid, stid: i.stid, qty_diminta: Number(i.qty_diminta),
         }));
     } else {
         formItems.value = [];
@@ -181,7 +181,7 @@ onMounted(() => {
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-border bg-black text-left text-xs font-medium text-white">
-                                <th class="p-2 font-medium">Aroma</th>
+                                <th class="p-2 font-medium">Barang</th>
                                 <th class="w-[140px] p-2 font-medium">Satuan</th>
                                 <th class="w-[120px] p-2 font-medium">Qty</th>
                                 <th class="w-9 p-2"></th>
@@ -191,12 +191,12 @@ onMounted(() => {
                             <tr v-for="(row, index) in formItems" :key="index" class="border-b border-border last:border-b-0">
                                 <td class="p-2 align-top">
                                     <Combobox
-                                        v-model="row.arid"
-                                        :options="aromaOptions"
-                                        option-value="arid"
-                                        option-label="nama_aroma"
-                                        placeholder="Pilih aroma"
-                                        empty-text="Aroma tidak ditemukan."
+                                        v-model="row.mbid"
+                                        :options="masterBarangOptions"
+                                        option-value="mbid"
+                                        option-label="nama_barang"
+                                        placeholder="Pilih barang"
+                                        empty-text="Barang tidak ditemukan."
                                     />
                                 </td>
                                 <td class="p-2 align-top">
@@ -235,9 +235,9 @@ onMounted(() => {
         <Dialog v-model:open="showAllDialog">
             <DialogContent class="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Semua Barang (Aroma)</DialogTitle>
+                    <DialogTitle>Semua Barang</DialogTitle>
                 </DialogHeader>
-                <Input v-model="allBarangSearch" placeholder="Cari aroma..." />
+                <Input v-model="allBarangSearch" placeholder="Cari barang..." />
                 <div class="min-h-80 max-h-80 overflow-y-auto rounded-lg border border-border">
                     <p v-if="allBarangLoading" class="p-4 text-center text-sm text-muted-foreground">
                         Memuat...
@@ -245,21 +245,21 @@ onMounted(() => {
                     <template v-else>
                         <button
                             v-for="a in allBarangResults"
-                            :key="a.arid"
+                            :key="a.mbid"
                             type="button"
                             class="flex w-full items-center justify-between border-b border-border p-2.5 text-left text-sm last:border-b-0 hover:bg-accent"
-                            @click="addRowFromDialog(a.arid)"
+                            @click="addRowFromDialog(a.mbid)"
                         >
-                            <span>{{ a.nama_aroma }}</span>
+                            <span>{{ a.nama_barang }}</span>
                             <Plus class="size-4 text-muted-foreground" />
                         </button>
                         <p v-if="allBarangResults.length === 0" class="p-4 text-center text-sm text-muted-foreground">
-                            Aroma tidak ditemukan.
+                            Barang tidak ditemukan.
                         </p>
                     </template>
                 </div>
                 <div class="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{{ allBarangTotal }} aroma</span>
+                    <span>{{ allBarangTotal }} barang</span>
                     <div class="flex items-center gap-2">
                         <Button type="button" variant="outline" size="sm" :disabled="allBarangPage <= 1" @click="allBarangPage--">‹</Button>
                         <span class="px-1">{{ allBarangPage }}</span>

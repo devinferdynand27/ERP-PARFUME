@@ -8,7 +8,7 @@
         data-vue-props="{{ json_encode([
             'pbid' => $pbid,
             'formOptionsUrl' => route('permintaan-barang.form-options'),
-            'aromaDataUrl' => route('permintaan-barang.aroma-data'),
+            'masterBarangDataUrl' => route('permintaan-barang.master-barang-data'),
             'showUrl' => route('permintaan-barang.show', ['pbid' => $pbid]),
             'updateUrl' => route('permintaan-barang.update', ['pbid' => $pbid]),
             'indexUrl' => route('permintaan-barang.index'),

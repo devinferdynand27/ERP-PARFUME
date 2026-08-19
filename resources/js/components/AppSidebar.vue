@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import {
-    LayoutDashboard, FlaskConical, Truck, Scale,
+    LayoutDashboard, Package, Truck, Scale,
     ClipboardList, ShoppingCart, PackageCheck, X
 } from '@lucide/vue';
 
@@ -39,7 +39,7 @@ const menu = [
 
 const masterData = [
     { key: 'supplier', label: 'Master Supplier', icon: Truck, urlKey: 'supplier' },
-    { key: 'aroma', label: 'Master Aroma', icon: FlaskConical, urlKey: 'aroma' },
+    { key: 'master-barang', label: 'Master Barang', icon: Package, urlKey: 'masterBarang' },
     { key: 'satuan', label: 'Master Satuan', icon: Scale, urlKey: 'satuan' },
 ];
 
