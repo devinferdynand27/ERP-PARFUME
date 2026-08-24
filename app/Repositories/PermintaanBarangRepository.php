@@ -43,8 +43,9 @@ class PermintaanBarangRepository
     {
         return DB::selectOne('
             SELECT pb.pbid, pb.nomor_permintaan, pb.tanggal, pb.status, pb.catatan,
-                pb.create_id, pb.create_time, pb.modify_id, pb.modify_time
+                pb.create_id, a.nama_admin AS dibuat_oleh, pb.create_time, pb.modify_id, pb.modify_time
             FROM permintaan_barang pb
+            LEFT JOIN admin a ON a.adid = pb.create_id
             WHERE pb.pbid = ?
         ', [$pbid]);
     }
