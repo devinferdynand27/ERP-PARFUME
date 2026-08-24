@@ -57,7 +57,7 @@ class AuthTest extends TestCase
         
         $admin = new Admin((array) $adminRow);
 
-        $response = $this->actingAs($admin)->get('/master/aroma');
+        $response = $this->actingAs($admin)->get('/master/master-barang');
         $response->assertStatus(200);
     }
 
@@ -71,7 +71,7 @@ class AuthTest extends TestCase
         
         $kasir = new Admin((array) $kasirRow);
 
-        $response = $this->actingAs($kasir)->get('/master/aroma');
+        $response = $this->actingAs($kasir)->get('/master/master-barang');
         $response->assertStatus(403);
     }
 }

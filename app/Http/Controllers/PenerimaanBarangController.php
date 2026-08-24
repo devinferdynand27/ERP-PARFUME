@@ -123,9 +123,10 @@ class PenerimaanBarangController extends Controller
                 // Catatan: dulu di sini juga memanggil produkRepository->adjustStok()
                 // untuk menambah stok produk. Modul Master Produk sudah dihapus dan
                 // tabel produk tidak lagi dipakai di alur transaksi ini (diganti ke
-                // aroma yang tidak punya kolom stok), jadi pemanggilan itu dihapus.
-                // Penerimaan barang di modul ini murni mencatat riwayat penerimaan
-                // per aroma, tidak lagi menambah stok otomatis seperti sebelumnya.
+                // master_barang yang tidak punya kolom stok), jadi pemanggilan itu
+                // dihapus. Penerimaan barang di modul ini murni mencatat riwayat
+                // penerimaan per barang, tidak lagi menambah stok otomatis seperti
+                // sebelumnya.
             }
 
             $this->pesananPembelianRepository->recomputeStatus($ppid, $adid);
