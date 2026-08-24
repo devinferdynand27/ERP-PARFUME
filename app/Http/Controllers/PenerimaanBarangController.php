@@ -68,6 +68,17 @@ class PenerimaanBarangController extends Controller
         ]);
     }
 
+    public function print(int $pnid)
+    {
+        $header = $this->penerimaanBarangRepository->find($pnid);
+        abort_if(! $header, 404);
+
+        return view('penerimaan-barang.print', [
+            'header' => $header,
+            'items' => $this->penerimaanBarangRepository->getItems($pnid),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

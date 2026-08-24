@@ -56,10 +56,11 @@ class PenerimaanBarangRepository
     {
         return DB::select('
             SELECT d.pndid, d.pnid, d.ppdid, d.mbid, mb.nama_barang,
-                d.stid, s.nama_satuan, d.qty_diterima, d.harga_beli, d.subtotal
+                d.stid, s.nama_satuan, ppd.qty_dipesan, d.qty_diterima, d.harga_beli, d.subtotal
             FROM penerimaan_barang_detail d
             JOIN master_barang mb ON mb.mbid = d.mbid
             JOIN satuan s ON s.stid = d.stid
+            JOIN pesanan_pembelian_detail ppd ON ppd.ppdid = d.ppdid
             WHERE d.pnid = ?
             ORDER BY d.pndid ASC
         ', [$pnid]);
