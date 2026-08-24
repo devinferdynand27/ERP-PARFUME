@@ -27,6 +27,7 @@ const supplierOptions = ref([]);
 const permintaanDisetujui = ref([]);
 
 const selectedPbid = ref('none');
+const selectedPrHeader = ref(null);
 const form = reactive({
     spid: null,
     tanggal: new Date().toISOString().slice(0, 10),
@@ -73,8 +74,12 @@ async function load() {
 }
 
 watch(selectedPbid, async (pbid) => {
-    if (pbid === 'none') return;
+    if (pbid === 'none') {
+        selectedPrHeader.value = null;
+        return;
+    }
     const result = await http.get(buildUrl(props.dariPermintaanUrlTemplate, pbid));
+    selectedPrHeader.value = result.header;
     formItems.value = result.items.map((i) => ({
         pbdid: i.pbdid,
         mbid: i.mbid,
@@ -162,6 +167,32 @@ onMounted(() => {
             <div class="space-y-2">
                 <Label for="catatan">Catatan</Label>
                 <Input id="catatan" v-model="form.catatan" placeholder="Opsional" />
+            </div>
+
+            <div v-if="selectedPrHeader" class="rounded-lg border border-border bg-muted/30 p-4">
+                <p class="text-xs font-medium uppercase text-muted-foreground">Detail Permintaan Barang</p>
+                <div class="mt-2 grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p class="text-xs text-muted-foreground">Nomor Permintaan</p>
+                        <p class="font-medium">{{ selectedPrHeader.nomor_permintaan }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Tanggal</p>
+                        <p class="font-medium">{{ selectedPrHeader.tanggal }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Status</p>
+                        <p class="font-medium capitalize">{{ selectedPrHeader.status }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Dibuat Oleh</p>
+                        <p class="font-medium">{{ selectedPrHeader.dibuat_oleh || '-' }}</p>
+                    </div>
+                    <div class="col-span-3">
+                        <p class="text-xs text-muted-foreground">Catatan</p>
+                        <p class="font-medium">{{ selectedPrHeader.catatan || '-' }}</p>
+                    </div>
+                </div>
             </div>
 
             <div class="space-y-2">
