@@ -63,12 +63,12 @@ class PermintaanBarangRepository
     }
 
     /**
-     * Generate nomor permintaan format PB-{YYYYMM}-{0001}, berdasarkan nomor
-     * tertinggi bulan berjalan (bukan COUNT, aman dari gap data terhapus).
+     * Generate nomor permintaan format PB-{DDMMYYYY}-{0001}, berdasarkan nomor
+     * tertinggi hari berjalan (bukan COUNT, aman dari gap data terhapus).
      */
     public function generateNomorPermintaan(): string
     {
-        $prefix = 'PB-' . now()->format('Ym') . '-';
+        $prefix = 'PB-' . now()->format('dmY') . '-';
 
         $last = DB::selectOne('
             SELECT nomor_permintaan FROM permintaan_barang

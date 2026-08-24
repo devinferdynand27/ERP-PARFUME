@@ -51,7 +51,7 @@ class PesananPembelianController extends Controller
     public function formOptions()
     {
         return response()->json([
-            'master_barang' => $this->masterBarangRepository->getAktif(),
+            'masterBarang' => $this->masterBarangRepository->getAktif(),
             'satuan' => $this->satuanRepository->getAktif(),
             'supplier' => $this->supplierRepository->getAktif(),
             'nomor_po_berikutnya' => $this->pesananPembelianRepository->generateNomorPO(),

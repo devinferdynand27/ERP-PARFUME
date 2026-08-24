@@ -56,7 +56,7 @@ class PermintaanBarangController extends Controller
     public function formOptions()
     {
         return response()->json([
-            'master_barang' => $this->masterBarangRepository->getAktif(),
+            'masterBarang' => $this->masterBarangRepository->getAktif(),
             'satuan' => $this->satuanRepository->getAktif(),
             'nomor_permintaan_berikutnya' => $this->permintaanBarangRepository->generateNomorPermintaan(),
         ]);

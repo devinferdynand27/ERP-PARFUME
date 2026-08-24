@@ -296,14 +296,14 @@ function refreshDashboard() {
 
                         <!-- Vertical Bars Group -->
                         <div class="flex-1 flex items-end justify-around h-full pl-10 pr-2 z-10">
-                            <div v-for="barang in displayMasterBarang" :key="barang.nama_barang" class="flex flex-col items-center group relative w-16">
+                            <div v-for="masterBarang in displayMasterBarang" :key="masterBarang.nama_barang" class="flex flex-col items-center group relative w-16">
                                 <!-- Hover Tooltip -->
                                 <div class="absolute -top-10 scale-0 group-hover:scale-100 transition-all duration-150 bg-[#0F172A] text-white text-[11px] px-2 py-1 rounded shadow-md pointer-events-none z-20 whitespace-nowrap font-medium">
-                                    {{ barang.total_stok }} unit
+                                    {{ masterBarang.total_stok }} unit
                                 </div>
                                 <!-- Bar Graphic -->
                                 <div class="w-[44px] bg-[#0F172A] hover:bg-[#1E293B] rounded-t-[4px] transition-all duration-300"
-                                     :style="{ height: `${(Number(barang.total_stok) / maxMasterBarangStok) * 90}%`, minHeight: '6px' }">
+                                     :style="{ height: `${(Number(masterBarang.total_stok) / maxMasterBarangStok) * 90}%`, minHeight: '6px' }">
                                 </div>
                             </div>
                         </div>
@@ -311,8 +311,8 @@ function refreshDashboard() {
 
                     <!-- X-Axis Labels -->
                     <div class="flex justify-around pl-10 pr-2 pt-3 text-[11px] font-semibold text-[#64748B]">
-                        <span v-for="barang in displayMasterBarang" :key="barang.nama_barang" class="w-16 text-center truncate" :title="barang.nama_barang">
-                            {{ barang.nama_barang }}
+                        <span v-for="masterBarang in displayMasterBarang" :key="masterBarang.nama_barang" class="w-16 text-center truncate" :title="masterBarang.nama_barang">
+                            {{ masterBarang.nama_barang }}
                         </span>
                     </div>
                 </CardContent>

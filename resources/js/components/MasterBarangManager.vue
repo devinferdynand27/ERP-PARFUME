@@ -102,12 +102,12 @@ async function submitForm() {
 }
 
 async function nonaktifkan(item) {
-    if (!confirm(`Nonaktifkan barang "${item.nama_barang}"?`)) return;
+    if (!confirm(`Nonaktifkan master barang "${item.nama_barang}"?`)) return;
     try {
         await http.patch(buildUrl(props.toggleUrlTemplate, item.mbid));
         await loadData();
     } catch (e) {
-        errorMessage.value = e.body?.message ?? 'Gagal menonaktifkan barang.';
+        errorMessage.value = e.body?.message ?? 'Gagal menonaktifkan master barang.';
     }
 }
 
@@ -161,7 +161,7 @@ onMounted(loadData);
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Master Barang</h1>
-                <p class="text-sm text-muted-foreground">Kelola data master barang</p>
+                <p class="text-sm text-muted-foreground">Kelola varian master barang parfum</p>
             </div>
             <div class="flex items-center gap-2">
                 <DropdownMenu>

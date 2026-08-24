@@ -64,7 +64,7 @@ async function load() {
         http.get(props.formOptionsUrl),
         http.get(`${props.permintaanBarangDataUrl}?status=disetujui&per_page=1000`),
     ]);
-    masterBarangOptions.value = options.master_barang;
+    masterBarangOptions.value = options.masterBarang;
     satuanOptions.value = options.satuan;
     supplierOptions.value = options.supplier;
     permintaanDisetujui.value = prResult.data;

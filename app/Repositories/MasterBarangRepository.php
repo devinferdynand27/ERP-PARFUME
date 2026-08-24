@@ -20,7 +20,7 @@ class MasterBarangRepository
      * Untuk halaman manajemen (CRUD admin) — tampilkan aktif & nonaktif
      * sekaligus, supaya item yang dinonaktifkan tetap terlihat dan bisa
      * diaktifkan kembali. Gunakan getAktif() untuk dropdown/pilihan di form
-     * lain yang memang harus hanya menampilkan barang aktif.
+     * lain yang memang harus hanya menampilkan master barang aktif.
      */
     public function paginate(int $perPage, int $page, ?string $search = null): array
     {
@@ -49,8 +49,8 @@ class MasterBarangRepository
 
     /**
      * Untuk dialog pilih barang di form transaksi (permintaan/pesanan/
-     * penerimaan) — hanya barang aktif, dipaginate + searchable supaya aman
-     * untuk data ribuan baris (tidak seperti getAktif() yang ambil semua
+     * penerimaan) — hanya master barang aktif, dipaginate + searchable supaya
+     * aman untuk data ribuan baris (tidak seperti getAktif() yang ambil semua
      * sekaligus).
      */
     public function paginateAktif(int $perPage, int $page, ?string $search = null): array

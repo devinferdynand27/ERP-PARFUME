@@ -86,9 +86,13 @@ class PesananPembelianRepository
         ', [$ppid]);
     }
 
+    /**
+     * Generate nomor PO format PO-{DDMMYYYY}-{0001}, berdasarkan nomor
+     * tertinggi hari berjalan (bukan COUNT, aman dari gap data terhapus).
+     */
     public function generateNomorPO(): string
     {
-        $prefix = 'PO-' . now()->format('Ym') . '-';
+        $prefix = 'PO-' . now()->format('dmY') . '-';
 
         $last = DB::selectOne('
             SELECT nomor_po FROM pesanan_pembelian

@@ -88,7 +88,7 @@ function addRowFromDialog(mbid) {
 async function load() {
     loading.value = true;
     const options = await http.get(props.formOptionsUrl);
-    masterBarangOptions.value = options.master_barang;
+    masterBarangOptions.value = options.masterBarang;
     satuanOptions.value = options.satuan;
 
     if (isEdit) {
