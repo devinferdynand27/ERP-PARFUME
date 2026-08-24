@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/data', [PenerimaanBarangController::class, 'data'])->name('data');
         Route::get('/form-options', [PenerimaanBarangController::class, 'formOptions'])->name('form-options');
         Route::get('/create', [PenerimaanBarangController::class, 'create'])->name('create');
+        Route::get('/{pnid}/print', [PenerimaanBarangController::class, 'print'])->name('print');
         Route::get('/{pnid}', [PenerimaanBarangController::class, 'show'])->name('show');
         Route::post('/', [PenerimaanBarangController::class, 'store'])->name('store');
     });

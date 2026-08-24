@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { Search, Plus } from '@lucide/vue';
+import { Search, Plus, Printer } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,12 @@ import {
 const props = defineProps({
     dataUrl: { type: String, required: true },
     createUrl: { type: String, required: true },
+    printUrlTemplate: { type: String, required: true },
 });
+
+function buildUrl(template, id) {
+    return template.replace(/__\w+__/, id);
+}
 
 const items = ref([]);
 const total = ref(0);
@@ -87,13 +92,14 @@ onMounted(() => {
                         <TableHead class="uppercase tracking-wide text-xs">No. Faktur</TableHead>
                         <TableHead class="uppercase tracking-wide text-xs">Tanggal</TableHead>
                         <TableHead class="uppercase tracking-wide text-xs">Item</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs text-right">Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow v-if="loading">
-                        <TableCell colspan="5" class="text-center text-muted-foreground">Memuat...</TableCell>
+                        <TableCell colspan="6" class="text-center text-muted-foreground">Memuat...</TableCell>
                     </TableRow>
-                    <TableEmpty v-else-if="items.length === 0" :colspan="5">
+                    <TableEmpty v-else-if="items.length === 0" :colspan="6">
                         Belum ada penerimaan barang.
                     </TableEmpty>
                     <TableRow v-for="item in items" :key="item.pnid">
@@ -102,6 +108,18 @@ onMounted(() => {
                         <TableCell>{{ item.nomor_faktur_supplier ?? '-' }}</TableCell>
                         <TableCell>{{ item.tanggal }}</TableCell>
                         <TableCell>{{ item.total_item }} item</TableCell>
+                        <TableCell class="text-right">
+                            <div class="flex justify-end gap-2">
+                                <a
+                                    :href="buildUrl(printUrlTemplate, item.pnid)"
+                                    target="_blank"
+                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    title="Cetak"
+                                >
+                                    <Printer class="size-4" />
+                                </a>
+                            </div>
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
