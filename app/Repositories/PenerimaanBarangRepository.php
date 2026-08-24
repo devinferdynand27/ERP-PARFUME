@@ -55,19 +55,23 @@ class PenerimaanBarangRepository
     public function getItems(int $pnid): array
     {
         return DB::select('
-            SELECT d.pndid, d.pnid, d.ppdid, d.arid, a.nama_aroma,
+            SELECT d.pndid, d.pnid, d.ppdid, d.mbid, mb.nama_barang,
                 d.stid, s.nama_satuan, d.qty_diterima, d.harga_beli, d.subtotal
             FROM penerimaan_barang_detail d
-            JOIN aroma a ON a.arid = d.arid
+            JOIN master_barang mb ON mb.mbid = d.mbid
             JOIN satuan s ON s.stid = d.stid
             WHERE d.pnid = ?
             ORDER BY d.pndid ASC
         ', [$pnid]);
     }
 
+    /**
+     * Generate nomor penerimaan format GRN-{DDMMYYYY}-{0001}, berdasarkan nomor
+     * tertinggi hari berjalan (bukan COUNT, aman dari gap data terhapus).
+     */
     public function generateNomorPenerimaan(): string
     {
-        $prefix = 'GRN-' . now()->format('Ym') . '-';
+        $prefix = 'GRN-' . now()->format('dmY') . '-';
 
         $last = DB::selectOne('
             SELECT nomor_penerimaan FROM penerimaan_barang
@@ -106,12 +110,12 @@ class PenerimaanBarangRepository
         $subtotal = $item['qty_diterima'] * $item['harga_beli'];
 
         DB::insert('
-            INSERT INTO penerimaan_barang_detail (pnid, ppdid, arid, stid, qty_diterima, harga_beli, subtotal)
+            INSERT INTO penerimaan_barang_detail (pnid, ppdid, mbid, stid, qty_diterima, harga_beli, subtotal)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ', [
             $pnid,
             $item['ppdid'],
-            $item['arid'],
+            $item['mbid'],
             $item['stid'],
             $item['qty_diterima'],
             $item['harga_beli'],

@@ -111,7 +111,7 @@
         <thead>
             <tr>
                 <th style="width: 32px;">No</th>
-                <th>Aroma</th>
+                <th>Barang</th>
                 <th style="width: 120px;">Satuan</th>
                 <th style="width: 100px;" class="num">Qty Diminta</th>
             </tr>
@@ -120,7 +120,7 @@
             @foreach ($items as $index => $item)
                 <tr>
                     <td class="center">{{ $index + 1 }}</td>
-                    <td>{{ $item->nama_aroma }}</td>
+                    <td>{{ $item->nama_barang }}</td>
                     <td>{{ $item->nama_satuan }}</td>
                     <td class="num">{{ rtrim(rtrim(number_format($item->qty_diminta, 2, '.', ''), '0'), '.') }}</td>
                 </tr>

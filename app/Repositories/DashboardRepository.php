@@ -40,9 +40,9 @@ class DashboardRepository
 
         // 2. Daftar produk dengan stok kritis (Alert)
         $lowStockProducts = DB::select('
-            SELECT p.prid, p.kode_produk, p.nama_produk, p.stok, p.stok_minimum, a.nama_aroma
+            SELECT p.prid, p.kode_produk, p.nama_produk, p.stok, p.stok_minimum, mb.nama_barang
             FROM produk p
-            LEFT JOIN aroma a ON p.arid = a.arid
+            LEFT JOIN master_barang mb ON p.mbid = mb.mbid
             WHERE p.aktif = 1 AND p.stok <= p.stok_minimum
             ORDER BY p.stok ASC
             LIMIT 5
@@ -61,14 +61,14 @@ class DashboardRepository
             LIMIT 5
         ');
 
-        // 4. Volume Stok per Aroma Teraktif (Top 8)
-        $topAromas = DB::select('
-            SELECT a.nama_aroma, COALESCE(SUM(p.stok), 0) AS total_stok
+        // 4. Volume Stok per Master Barang Teraktif (Top 8)
+        $topMasterBarang = DB::select('
+            SELECT mb.nama_barang, COALESCE(SUM(p.stok), 0) AS total_stok
             FROM produk p
-            JOIN aroma a ON p.arid = a.arid
-            WHERE p.aktif = 1 AND a.aktif = 1
-            GROUP BY p.arid, a.nama_aroma
-            ORDER BY total_stok DESC, a.nama_aroma ASC
+            JOIN master_barang mb ON p.mbid = mb.mbid
+            WHERE p.aktif = 1 AND mb.aktif = 1
+            GROUP BY p.mbid, mb.nama_barang
+            ORDER BY total_stok DESC, mb.nama_barang ASC
             LIMIT 8
         ');
 
@@ -83,7 +83,7 @@ class DashboardRepository
             ],
             'low_stock_products' => $lowStockProducts,
             'recent_activities' => $recentActivities,
-            'top_aromas' => $topAromas,
+            'top_master_barang' => $topMasterBarang,
         ];
     }
 }

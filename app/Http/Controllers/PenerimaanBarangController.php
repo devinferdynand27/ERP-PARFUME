@@ -113,7 +113,7 @@ class PenerimaanBarangController extends Controller
 
                 $this->penerimaanBarangRepository->insertItem($pnid, [
                     'ppdid' => $item['ppdid'],
-                    'arid' => $detail->arid,
+                    'mbid' => $detail->mbid,
                     'stid' => $ppDetailFull->stid,
                     'qty_diterima' => $item['qty_diterima'],
                     'harga_beli' => $ppDetailFull->harga_satuan,

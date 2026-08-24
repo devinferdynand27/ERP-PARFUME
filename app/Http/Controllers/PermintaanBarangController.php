@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\AromaRepository;
+use App\Repositories\MasterBarangRepository;
 use App\Repositories\PermintaanBarangRepository;
 use App\Repositories\SatuanRepository;
 use Illuminate\Http\Request;
@@ -12,7 +12,7 @@ class PermintaanBarangController extends Controller
 {
     public function __construct(
         private PermintaanBarangRepository $permintaanBarangRepository,
-        private AromaRepository $aromaRepository,
+        private MasterBarangRepository $masterBarangRepository,
         private SatuanRepository $satuanRepository,
     ) {
     }
@@ -56,20 +56,20 @@ class PermintaanBarangController extends Controller
     public function formOptions()
     {
         return response()->json([
-            'aroma' => $this->aromaRepository->getAktif(),
+            'masterBarang' => $this->masterBarangRepository->getAktif(),
             'satuan' => $this->satuanRepository->getAktif(),
             'nomor_permintaan_berikutnya' => $this->permintaanBarangRepository->generateNomorPermintaan(),
         ]);
     }
 
-    public function aromaData(Request $request)
+    public function masterBarangData(Request $request)
     {
         $perPage = (int) $request->integer('per_page', 20);
         $page = (int) $request->integer('page', 1);
         $search = $request->string('search')->toString();
 
         return response()->json(
-            $this->aromaRepository->paginateAktif($perPage, $page, $search !== '' ? $search : null)
+            $this->masterBarangRepository->paginateAktif($perPage, $page, $search !== '' ? $search : null)
         );
     }
 
@@ -101,7 +101,7 @@ class PermintaanBarangController extends Controller
             'tanggal' => ['required', 'date'],
             'catatan' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.arid' => ['required', 'integer', 'exists:aroma,arid'],
+            'items.*.mbid' => ['required', 'integer', 'exists:master_barang,mbid'],
             'items.*.stid' => ['required', 'integer', 'exists:satuan,stid'],
             'items.*.qty_diminta' => ['required', 'numeric', 'min:0.01'],
         ]);

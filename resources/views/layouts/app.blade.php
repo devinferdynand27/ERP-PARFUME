@@ -17,7 +17,7 @@
                 'urls' => [
                     'dashboard' => url('/'),
                     'supplier' => route('supplier.index'),
-                    'aroma' => route('aroma.index'),
+                    'masterBarang' => route('master-barang.index'),
                     'satuan' => route('satuan.index'),
                     'permintaanBarang' => route('permintaan-barang.index'),
                     'pesananPembelian' => route('pesanan-pembelian.index'),

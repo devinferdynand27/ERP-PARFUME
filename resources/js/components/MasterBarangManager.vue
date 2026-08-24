@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const EXPORT_COLUMNS = [
-    { key: 'nama_aroma', label: 'Aroma' },
+    { key: 'nama_barang', label: 'Barang' },
     { key: 'kategori', label: 'Kategori' },
 ];
 
@@ -41,12 +41,12 @@ const loading = ref(false);
 const errorMessage = ref('');
 
 const dialogOpen = ref(false);
-const editingArid = ref(null);
-const form = reactive({ nama_aroma: '', kategori: '' });
+const editingMbid = ref(null);
+const form = reactive({ nama_barang: '', kategori: '' });
 const formErrors = ref({});
 
-function buildUrl(template, arid) {
-    return template.replace('__arid__', arid);
+function buildUrl(template, mbid) {
+    return template.replace('__mbid__', mbid);
 }
 
 async function loadData() {
@@ -60,23 +60,23 @@ async function loadData() {
         items.value = result.data;
         total.value = result.total;
     } catch (e) {
-        errorMessage.value = 'Gagal memuat data aroma.';
+        errorMessage.value = 'Gagal memuat data master barang.';
     } finally {
         loading.value = false;
     }
 }
 
 function openCreate() {
-    editingArid.value = null;
-    form.nama_aroma = '';
+    editingMbid.value = null;
+    form.nama_barang = '';
     form.kategori = '';
     formErrors.value = {};
     dialogOpen.value = true;
 }
 
 function openEdit(item) {
-    editingArid.value = item.arid;
-    form.nama_aroma = item.nama_aroma;
+    editingMbid.value = item.mbid;
+    form.nama_barang = item.nama_barang;
     form.kategori = item.kategori;
     formErrors.value = {};
     dialogOpen.value = true;
@@ -85,8 +85,8 @@ function openEdit(item) {
 async function submitForm() {
     formErrors.value = {};
     try {
-        if (editingArid.value) {
-            await http.put(buildUrl(props.updateUrlTemplate, editingArid.value), form);
+        if (editingMbid.value) {
+            await http.put(buildUrl(props.updateUrlTemplate, editingMbid.value), form);
         } else {
             await http.post(props.storeUrl, form);
         }
@@ -96,18 +96,18 @@ async function submitForm() {
         if (e.status === 422 && e.body?.errors) {
             formErrors.value = e.body.errors;
         } else {
-            errorMessage.value = 'Gagal menyimpan data aroma.';
+            errorMessage.value = 'Gagal menyimpan data master barang.';
         }
     }
 }
 
 async function nonaktifkan(item) {
-    if (!confirm(`Nonaktifkan aroma "${item.nama_aroma}"?`)) return;
+    if (!confirm(`Nonaktifkan master barang "${item.nama_barang}"?`)) return;
     try {
-        await http.patch(buildUrl(props.toggleUrlTemplate, item.arid));
+        await http.patch(buildUrl(props.toggleUrlTemplate, item.mbid));
         await loadData();
     } catch (e) {
-        errorMessage.value = e.body?.message ?? 'Gagal menonaktifkan aroma.';
+        errorMessage.value = e.body?.message ?? 'Gagal menonaktifkan master barang.';
     }
 }
 
@@ -120,7 +120,7 @@ async function loadAllForExport() {
 
 async function handleExportExcel() {
     try {
-        exportToExcel(EXPORT_COLUMNS, await loadAllForExport(), 'master-aroma');
+        exportToExcel(EXPORT_COLUMNS, await loadAllForExport(), 'master-barang');
     } catch (e) {
         errorMessage.value = 'Gagal export Excel.';
     }
@@ -128,7 +128,7 @@ async function handleExportExcel() {
 
 async function handleExportPdf() {
     try {
-        exportToPdf(EXPORT_COLUMNS, await loadAllForExport(), 'master-aroma', 'Master Aroma');
+        exportToPdf(EXPORT_COLUMNS, await loadAllForExport(), 'master-barang', 'Master Barang');
     } catch (e) {
         errorMessage.value = 'Gagal export PDF.';
     }
@@ -136,7 +136,7 @@ async function handleExportPdf() {
 
 async function handlePrint() {
     try {
-        printTable(EXPORT_COLUMNS, await loadAllForExport(), 'Master Aroma');
+        printTable(EXPORT_COLUMNS, await loadAllForExport(), 'Master Barang');
     } catch (e) {
         errorMessage.value = 'Gagal mencetak data.';
     }
@@ -160,8 +160,8 @@ onMounted(loadData);
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Master Aroma</h1>
-                <p class="text-sm text-muted-foreground">Kelola varian aroma parfum</p>
+                <h1 class="text-2xl font-bold tracking-tight">Master Barang</h1>
+                <p class="text-sm text-muted-foreground">Kelola varian master barang parfum</p>
             </div>
             <div class="flex items-center gap-2">
                 <DropdownMenu>
@@ -178,7 +178,7 @@ onMounted(loadData);
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <Button @click="openCreate">
-                    <span class="mr-1 text-base leading-none">+</span> Tambah Aroma
+                    <span class="mr-1 text-base leading-none">+</span> Tambah Barang
                 </Button>
             </div>
         </div>
@@ -189,7 +189,7 @@ onMounted(loadData);
             <div class="flex items-center justify-between gap-4 border-b border-border p-4">
                 <div class="relative max-w-xs flex-1">
                     <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input v-model="search" placeholder="Cari nama aroma atau kategori..." class="pl-9" />
+                    <Input v-model="search" placeholder="Cari nama barang atau kategori..." class="pl-9" />
                 </div>
                 <span class="shrink-0 text-sm text-muted-foreground">{{ total }} data</span>
             </div>
@@ -197,7 +197,7 @@ onMounted(loadData);
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead class="uppercase tracking-wide text-xs">Aroma</TableHead>
+                        <TableHead class="uppercase tracking-wide text-xs">Barang</TableHead>
                         <TableHead class="uppercase tracking-wide text-xs">Kategori</TableHead>
                         <TableHead class="text-right uppercase tracking-wide text-xs">Aksi</TableHead>
                     </TableRow>
@@ -207,17 +207,17 @@ onMounted(loadData);
                         <TableCell colspan="3" class="text-center text-muted-foreground">Memuat...</TableCell>
                     </TableRow>
                     <TableEmpty v-else-if="items.length === 0" :colspan="3">
-                        Belum ada data aroma.
+                        Belum ada data master barang.
                     </TableEmpty>
-                    <TableRow v-for="item in items" :key="item.arid">
+                    <TableRow v-for="item in items" :key="item.mbid">
                         <TableCell>
                             <div class="flex items-center gap-3">
                                 <Avatar class="size-9 rounded-lg">
-                                    <AvatarFallback :class="['rounded-lg font-semibold', colorFor(item.nama_aroma)]">
-                                        {{ initialOf(item.nama_aroma) }}
+                                    <AvatarFallback :class="['rounded-lg font-semibold', colorFor(item.nama_barang)]">
+                                        {{ initialOf(item.nama_barang) }}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span class="font-medium">{{ item.nama_aroma }}</span>
+                                <span class="font-medium">{{ item.nama_barang }}</span>
                             </div>
                         </TableCell>
                         <TableCell>{{ item.kategori }}</TableCell>
@@ -256,14 +256,14 @@ onMounted(loadData);
         <Dialog v-model:open="dialogOpen">
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{ editingArid ? 'Edit Aroma' : 'Tambah Aroma' }}</DialogTitle>
+                    <DialogTitle>{{ editingMbid ? 'Edit Barang' : 'Tambah Barang' }}</DialogTitle>
                 </DialogHeader>
                 <form class="space-y-4" @submit.prevent="submitForm">
                     <div class="space-y-2">
-                        <Label for="nama_aroma">Nama Aroma</Label>
-                        <Input id="nama_aroma" v-model="form.nama_aroma" />
-                        <p v-if="formErrors.nama_aroma" class="text-sm text-destructive">
-                            {{ formErrors.nama_aroma[0] }}
+                        <Label for="nama_barang">Nama Barang</Label>
+                        <Input id="nama_barang" v-model="form.nama_barang" />
+                        <p v-if="formErrors.nama_barang" class="text-sm text-destructive">
+                            {{ formErrors.nama_barang[0] }}
                         </p>
                     </div>
                     <div class="space-y-2">
