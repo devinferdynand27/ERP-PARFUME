@@ -1,13 +1,11 @@
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 import { ArrowLeft } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+import Combobox from '@/components/ui/combobox/Combobox.vue';
 
 const props = defineProps({
     formOptionsUrl: { type: String, required: true },
@@ -20,6 +18,10 @@ const saving = ref(false);
 const errorMessage = ref('');
 
 const poOptions = ref([]);
+const poComboOptions = computed(() => poOptions.value.map((po) => ({
+    ppid: po.ppid,
+    label: `${po.nomor_po} — ${po.nama_supplier}`,
+})));
 const selectedPpid = ref(null);
 const sisaItems = ref([]);
 
@@ -106,14 +108,14 @@ onMounted(() => {
         <form v-else class="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm" @submit.prevent="submitForm">
             <div class="space-y-2">
                 <Label>Pesanan Pembelian</Label>
-                <Select v-model="selectedPpid">
-                    <SelectTrigger><SelectValue placeholder="Pilih PO yang belum diterima penuh" /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem v-for="po in poOptions" :key="po.ppid" :value="po.ppid">
-                            {{ po.nomor_po }} — {{ po.nama_supplier }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                <Combobox
+                    v-model="selectedPpid"
+                    :options="poComboOptions"
+                    option-value="ppid"
+                    option-label="label"
+                    placeholder="Pilih PO yang belum diterima penuh"
+                    search-placeholder="Cari nomor PO / supplier..."
+                />
                 <p v-if="formErrors.ppid" class="text-sm text-destructive">{{ formErrors.ppid[0] }}</p>
             </div>
 
