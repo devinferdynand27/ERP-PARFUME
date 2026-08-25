@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { Search, Plus } from '@lucide/vue';
+import { Search, Plus, Printer } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ const props = defineProps({
     dataUrl: { type: String, required: true },
     createUrl: { type: String, required: true },
     statusUrlTemplate: { type: String, required: true },
+    printUrlTemplate: { type: String, required: true },
 });
 
 const items = ref([]);
@@ -162,13 +163,23 @@ onMounted(() => {
                             </span>
                         </TableCell>
                         <TableCell class="text-right">
-                            <Button
-                                v-if="item.status === 'diterbitkan'"
-                                size="sm" variant="outline" class="text-destructive"
-                                @click="batalkan(item)"
-                            >
-                                Batalkan
-                            </Button>
+                            <div class="flex justify-end gap-2">
+                                <a
+                                    :href="buildUrl(printUrlTemplate, item.ppid)"
+                                    target="_blank"
+                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    title="Cetak"
+                                >
+                                    <Printer class="size-4" />
+                                </a>
+                                <Button
+                                    v-if="item.status === 'diterbitkan'"
+                                    size="sm" variant="outline" class="text-destructive"
+                                    @click="batalkan(item)"
+                                >
+                                    Batalkan
+                                </Button>
+                            </div>
                         </TableCell>
                     </TableRow>
                 </TableBody>
