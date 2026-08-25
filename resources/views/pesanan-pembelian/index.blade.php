@@ -9,6 +9,7 @@
             'dataUrl' => route('pesanan-pembelian.data'),
             'createUrl' => route('pesanan-pembelian.create'),
             'statusUrlTemplate' => route('pesanan-pembelian.status', ['ppid' => '__ppid__']),
+            'printUrlTemplate' => route('pesanan-pembelian.print', ['ppid' => '__ppid__']),
         ]) }}"
     ></div>
 @endsection

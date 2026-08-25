@@ -70,6 +70,17 @@ class PesananPembelianController extends Controller
         ]);
     }
 
+    public function print(int $ppid)
+    {
+        $header = $this->pesananPembelianRepository->find($ppid);
+        abort_if(! $header, 404);
+
+        return view('pesanan-pembelian.print', [
+            'header' => $header,
+            'items' => $this->pesananPembelianRepository->getItems($ppid),
+        ]);
+    }
+
     public function show(int $ppid)
     {
         $header = $this->pesananPembelianRepository->find($ppid);
