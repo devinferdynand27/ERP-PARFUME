@@ -162,6 +162,57 @@ class PesananPembelianRepository
         }
     }
 
+    /**
+     * Row lock header PO, dipakai update() untuk cek ulang status di dalam
+     * transaction sebelum menerapkan perubahan (pola sama seperti
+     * getDetailForUpdate()) — cegah race dengan penerimaan barang yang
+     * berjalan bersamaan.
+     */
+    public function findForUpdate(int $ppid): ?object
+    {
+        return DB::selectOne('
+            SELECT ppid, status FROM pesanan_pembelian WHERE ppid = ? FOR UPDATE
+        ', [$ppid]);
+    }
+
+    /**
+     * Hanya boleh dipanggil saat status masih 'diterbitkan' (dicek di
+     * controller & findForUpdate) — status itu berarti belum ada
+     * qty_diterima sama sekali (lihat recomputeStatus()), jadi replace
+     * seluruh baris detail aman, tidak ada FK penerimaan_barang_detail yang
+     * menunjuk ppdid lama.
+     */
+    public function update(int $ppid, array $header, array $items, ?int $adid): bool
+    {
+        $totalItem = count($items);
+        $totalQty = array_sum(array_column($items, 'qty_dipesan'));
+        $totalHarga = 0;
+        foreach ($items as $item) {
+            $totalHarga += $item['qty_dipesan'] * $item['harga_satuan'];
+        }
+
+        $updated = DB::update('
+            UPDATE pesanan_pembelian
+            SET spid = ?, tanggal = ?, total_item = ?, total_qty = ?, total_harga = ?, catatan = ?,
+                modify_id = ?, modify_time = NOW()
+            WHERE ppid = ?
+        ', [
+            $header['spid'],
+            $header['tanggal'],
+            $totalItem,
+            $totalQty,
+            $totalHarga,
+            $header['catatan'] ?? null,
+            $adid,
+            $ppid,
+        ]) > 0;
+
+        DB::delete('DELETE FROM pesanan_pembelian_detail WHERE ppid = ?', [$ppid]);
+        $this->insertItems($ppid, $items);
+
+        return $updated;
+    }
+
     public function updateStatus(int $ppid, string $status, ?int $adid): bool
     {
         return DB::update('

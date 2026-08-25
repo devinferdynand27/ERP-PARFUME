@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { Search, Plus, Printer } from '@lucide/vue';
+import { Search, Plus, Printer, Pencil } from '@lucide/vue';
 import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,7 @@ const props = defineProps({
     createUrl: { type: String, required: true },
     statusUrlTemplate: { type: String, required: true },
     printUrlTemplate: { type: String, required: true },
+    editUrlTemplate: { type: String, required: true },
 });
 
 const items = ref([]);
@@ -164,6 +165,14 @@ onMounted(() => {
                         </TableCell>
                         <TableCell class="text-right">
                             <div class="flex justify-end gap-2">
+                                <a
+                                    v-if="item.status === 'diterbitkan'"
+                                    :href="buildUrl(editUrlTemplate, item.ppid)"
+                                    class="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                                    title="Edit"
+                                >
+                                    <Pencil class="size-4" />
+                                </a>
                                 <a
                                     :href="buildUrl(printUrlTemplate, item.ppid)"
                                     target="_blank"

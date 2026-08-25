@@ -70,6 +70,15 @@ class PesananPembelianController extends Controller
         ]);
     }
 
+    public function edit(int $ppid)
+    {
+        $header = $this->pesananPembelianRepository->find($ppid);
+        abort_if(! $header, 404);
+        abort_if($header->status !== 'diterbitkan', 404);
+
+        return view('pesanan-pembelian.edit', ['ppid' => $ppid]);
+    }
+
     public function print(int $ppid)
     {
         $header = $this->pesananPembelianRepository->find($ppid);
@@ -121,6 +130,41 @@ class PesananPembelianController extends Controller
         });
 
         return response()->json($this->showPayload($ppid), 201);
+    }
+
+    public function update(Request $request, int $ppid)
+    {
+        $validated = $request->validate([
+            'spid' => ['required', 'integer', 'exists:supplier,spid'],
+            'tanggal' => ['required', 'date'],
+            'catatan' => ['nullable', 'string'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.pbdid' => ['nullable', 'integer', 'exists:permintaan_barang_detail,pbdid'],
+            'items.*.mbid' => ['required', 'integer', 'exists:master_barang,mbid'],
+            'items.*.stid' => ['required', 'integer', 'exists:satuan,stid'],
+            'items.*.qty_dipesan' => ['required', 'numeric', 'min:0.01'],
+            'items.*.harga_satuan' => ['required', 'numeric', 'min:0'],
+        ]);
+        $adid = optional($request->user())->adid;
+
+        DB::transaction(function () use ($ppid, $validated, $adid) {
+            $locked = $this->pesananPembelianRepository->findForUpdate($ppid);
+            abort_if(! $locked, 404);
+            abort_if($locked->status !== 'diterbitkan', 422, 'PO hanya bisa diubah selama berstatus diterbitkan dan belum ada penerimaan barang.');
+
+            $this->pesananPembelianRepository->update(
+                $ppid,
+                [
+                    'spid' => $validated['spid'],
+                    'tanggal' => $validated['tanggal'],
+                    'catatan' => $validated['catatan'] ?? null,
+                ],
+                $validated['items'],
+                $adid
+            );
+        });
+
+        return response()->json($this->showPayload($ppid));
     }
 
     public function updateStatus(Request $request, int $ppid)
