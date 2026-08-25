@@ -48,7 +48,7 @@ async function handleLogin() {
             <CardHeader class="space-y-1 text-center">
                 <div class="flex justify-center mb-2">
                     <div class="flex items-center justify-center rounded-xl bg-foreground text-background p-2.5 shadow-sm">
-                        <span class="text-xl font-bold tracking-tight leading-none px-1">CAVA</span>
+                        <span class="text-xl font-bold tracking-tight leading-none px-1">ERP PARFUME</span>
                     </div>
                 </div>
                 <CardTitle class="text-2xl font-bold tracking-tight">Selamat Datang Kembali</CardTitle>

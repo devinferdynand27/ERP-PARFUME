@@ -68,7 +68,7 @@ const transaksi = [
         <!-- Brand / Logo Area (Ditambah tombol close khusus mobile) -->
         <div class="border-b border-[#E2E8F0] px-6 py-5 flex items-center justify-between">
             <div>
-                <div class="text-xl font-bold tracking-tight text-[#0F172A]">CAVA</div>
+                <div class="text-xl font-bold tracking-tight text-[#0F172A]">ERP PARFUME</div>
                 <div class="text-[9px] font-semibold tracking-widest text-[#94A3B8] uppercase">
                     Parfums | Luxury Fragrances
                 </div>

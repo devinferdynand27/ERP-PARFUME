@@ -83,7 +83,7 @@
 
     <div class="header">
         <div>
-            <div class="brand-name">CAVA / PARFUMS</div>
+            <div class="brand-name">ERP PARFUME</div>
             <div class="brand-sub">LUXURY FRAGRANCES</div>
         </div>
         <div class="doc-title">

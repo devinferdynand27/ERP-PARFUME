@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Buat Pesanan Pembelian - CAVA Parfums')
+@section('title', 'Buat Pesanan Pembelian - ERP PARFUME')
 
 @section('content')
     <div
