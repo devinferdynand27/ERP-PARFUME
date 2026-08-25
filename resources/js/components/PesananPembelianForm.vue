@@ -62,6 +62,12 @@ function removeRow(index) {
     formItems.value.splice(index, 1);
 }
 
+// ponytail: cursor jumps to end on each keystroke, acceptable for append-style price entry
+function onHargaInput(index, value) {
+    const digits = String(value).replace(/\D/g, '');
+    formItems.value[index].harga_satuan = digits === '' ? 0 : Number(digits);
+}
+
 async function load() {
     loading.value = true;
     const [options, prResult] = await Promise.all([
@@ -243,7 +249,13 @@ onMounted(() => {
                                     <Input v-model="row.qty_dipesan" type="number" min="0.01" step="0.01" placeholder="Qty" :disabled="hasPr" />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <Input v-model="row.harga_satuan" type="number" min="0" placeholder="Harga satuan" />
+                                    <Input
+                                        :model-value="formatRupiah(row.harga_satuan)"
+                                        type="text"
+                                        inputmode="numeric"
+                                        placeholder="Rp 0"
+                                        @update:model-value="onHargaInput(index, $event)"
+                                    />
                                 </td>
                                 <td class="p-2 align-top">
                                     <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" :disabled="hasPr" @click="removeRow(index)">
