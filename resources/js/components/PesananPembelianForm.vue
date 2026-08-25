@@ -5,9 +5,7 @@ import { http } from '@/lib/http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+import Combobox from '@/components/ui/combobox/Combobox.vue';
 
 const props = defineProps({
     formOptionsUrl: { type: String, required: true },
@@ -26,7 +24,13 @@ const satuanOptions = ref([]);
 const supplierOptions = ref([]);
 const permintaanDisetujui = ref([]);
 
-const selectedPbid = ref('none');
+const selectedPbid = ref(null);
+const selectedPrHeader = ref(null);
+const prOptions = computed(() => [
+    { pbid: 'none', nomor_permintaan: 'Tanpa PR (langsung)' },
+    ...permintaanDisetujui.value,
+]);
+const hasPr = computed(() => !!selectedPbid.value && selectedPbid.value !== 'none');
 const form = reactive({
     spid: null,
     tanggal: new Date().toISOString().slice(0, 10),
@@ -73,8 +77,12 @@ async function load() {
 }
 
 watch(selectedPbid, async (pbid) => {
-    if (pbid === 'none') return;
+    if (!pbid || pbid === 'none') {
+        selectedPrHeader.value = null;
+        return;
+    }
     const result = await http.get(buildUrl(props.dariPermintaanUrlTemplate, pbid));
+    selectedPrHeader.value = result.header;
     formItems.value = result.items.map((i) => ({
         pbdid: i.pbdid,
         mbid: i.mbid,
@@ -89,7 +97,7 @@ async function submitForm() {
     saving.value = true;
     const payload = {
         ...form,
-        pbid: selectedPbid.value === 'none' ? null : selectedPbid.value,
+        pbid: hasPr.value ? selectedPbid.value : null,
         items: formItems.value,
     };
     try {
@@ -133,24 +141,23 @@ onMounted(() => {
             <div class="grid grid-cols-3 gap-4">
                 <div class="space-y-2">
                     <Label>Dari Permintaan Barang</Label>
-                    <Select v-model="selectedPbid">
-                        <SelectTrigger><SelectValue placeholder="Tanpa PR" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">Tanpa PR (langsung)</SelectItem>
-                            <SelectItem v-for="pr in permintaanDisetujui" :key="pr.pbid" :value="pr.pbid">
-                                {{ pr.nomor_permintaan }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <Combobox
+                        v-model="selectedPbid"
+                        :options="prOptions"
+                        option-value="pbid"
+                        option-label="nomor_permintaan"
+                        placeholder="Tanpa PR"
+                    />
                 </div>
                 <div class="space-y-2">
                     <Label>Supplier</Label>
-                    <Select v-model="form.spid">
-                        <SelectTrigger><SelectValue placeholder="Pilih supplier" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="s in supplierOptions" :key="s.spid" :value="s.spid">{{ s.nama_supplier }}</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <Combobox
+                        v-model="form.spid"
+                        :options="supplierOptions"
+                        option-value="spid"
+                        option-label="nama_supplier"
+                        placeholder="Pilih supplier"
+                    />
                     <p v-if="formErrors.spid" class="text-sm text-destructive">{{ formErrors.spid[0] }}</p>
                 </div>
                 <div class="space-y-2">
@@ -164,10 +171,36 @@ onMounted(() => {
                 <Input id="catatan" v-model="form.catatan" placeholder="Opsional" />
             </div>
 
+            <div v-if="selectedPrHeader" class="rounded-lg border border-border bg-muted/30 p-4">
+                <p class="text-xs font-medium uppercase text-muted-foreground">Detail Permintaan Barang</p>
+                <div class="mt-2 grid grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <p class="text-xs text-muted-foreground">Nomor Permintaan</p>
+                        <p class="font-medium">{{ selectedPrHeader.nomor_permintaan }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Tanggal</p>
+                        <p class="font-medium">{{ selectedPrHeader.tanggal }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Status</p>
+                        <p class="font-medium capitalize">{{ selectedPrHeader.status }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-muted-foreground">Dibuat Oleh</p>
+                        <p class="font-medium">{{ selectedPrHeader.dibuat_oleh || '-' }}</p>
+                    </div>
+                    <div class="col-span-4">
+                        <p class="text-xs text-muted-foreground">Catatan</p>
+                        <p class="font-medium">{{ selectedPrHeader.catatan || '-' }}</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <Label>Item Barang</Label>
-                    <Button type="button" size="sm" variant="outline" @click="addRow" :disabled="selectedPbid !== 'none'">
+                    <Button type="button" size="sm" variant="outline" @click="addRow" :disabled="hasPr">
                         <Plus class="mr-1 size-4" /> Tambah Item
                     </Button>
                 </div>
@@ -187,29 +220,33 @@ onMounted(() => {
                         <tbody>
                             <tr v-for="(row, index) in formItems" :key="index" class="border-b border-border last:border-b-0">
                                 <td class="p-2 align-top">
-                                    <Select v-model="row.mbid" :disabled="selectedPbid !== 'none'">
-                                        <SelectTrigger><SelectValue placeholder="Pilih barang" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem v-for="a in masterBarangOptions" :key="a.mbid" :value="a.mbid">{{ a.nama_barang }}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Combobox
+                                        v-model="row.mbid"
+                                        :options="masterBarangOptions"
+                                        option-value="mbid"
+                                        option-label="nama_barang"
+                                        placeholder="Pilih barang"
+                                        :disabled="hasPr"
+                                    />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <Select v-model="row.stid" :disabled="selectedPbid !== 'none'">
-                                        <SelectTrigger><SelectValue placeholder="Satuan" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem v-for="s in satuanOptions" :key="s.stid" :value="s.stid">{{ s.nama_satuan }}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Combobox
+                                        v-model="row.stid"
+                                        :options="satuanOptions"
+                                        option-value="stid"
+                                        option-label="nama_satuan"
+                                        placeholder="Satuan"
+                                        :disabled="hasPr"
+                                    />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <Input v-model="row.qty_dipesan" type="number" min="0.01" step="0.01" placeholder="Qty" :disabled="selectedPbid !== 'none'" />
+                                    <Input v-model="row.qty_dipesan" type="number" min="0.01" step="0.01" placeholder="Qty" :disabled="hasPr" />
                                 </td>
                                 <td class="p-2 align-top">
                                     <Input v-model="row.harga_satuan" type="number" min="0" placeholder="Harga satuan" />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" :disabled="selectedPbid !== 'none'" @click="removeRow(index)">
+                                    <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" :disabled="hasPr" @click="removeRow(index)">
                                         <Trash2 class="size-4" />
                                     </button>
                                 </td>
