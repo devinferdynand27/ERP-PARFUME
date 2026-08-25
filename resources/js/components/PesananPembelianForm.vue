@@ -8,12 +8,17 @@ import { Label } from '@/components/ui/label';
 import Combobox from '@/components/ui/combobox/Combobox.vue';
 
 const props = defineProps({
+    ppid: { type: [Number, String], default: null },
     formOptionsUrl: { type: String, required: true },
     dariPermintaanUrlTemplate: { type: String, required: true },
+    showUrl: { type: String, default: null },
     storeUrl: { type: String, required: true },
+    updateUrl: { type: String, default: null },
     indexUrl: { type: String, required: true },
     permintaanBarangDataUrl: { type: String, required: true },
 });
+
+const isEditMode = computed(() => !!props.ppid);
 
 const loading = ref(true);
 const saving = ref(false);
@@ -31,6 +36,8 @@ const prOptions = computed(() => [
     ...permintaanDisetujui.value,
 ]);
 const hasPr = computed(() => !!selectedPbid.value && selectedPbid.value !== 'none');
+const itemsLockedByPr = computed(() => hasPr.value && !isEditMode.value);
+const initializing = ref(true);
 const form = reactive({
     spid: null,
     tanggal: new Date().toISOString().slice(0, 10),
@@ -78,11 +85,33 @@ async function load() {
     satuanOptions.value = options.satuan;
     supplierOptions.value = options.supplier;
     permintaanDisetujui.value = prResult.data;
-    addRow();
+
+    if (isEditMode.value) {
+        const detail = await http.get(props.showUrl);
+        form.spid = detail.header.spid;
+        form.tanggal = detail.header.tanggal;
+        form.catatan = detail.header.catatan ?? '';
+        formItems.value = detail.items.map((i) => ({
+            pbdid: i.pbdid,
+            mbid: i.mbid,
+            stid: i.stid,
+            qty_dipesan: Number(i.qty_dipesan),
+            harga_satuan: Number(i.harga_satuan),
+        }));
+        if (detail.header.pbid) {
+            selectedPbid.value = detail.header.pbid;
+            selectedPrHeader.value = { nomor_permintaan: detail.header.nomor_permintaan };
+        }
+    } else {
+        addRow();
+    }
+
     loading.value = false;
+    initializing.value = false;
 }
 
 watch(selectedPbid, async (pbid) => {
+    if (initializing.value) return;
     if (!pbid || pbid === 'none') {
         selectedPrHeader.value = null;
         return;
@@ -101,13 +130,16 @@ watch(selectedPbid, async (pbid) => {
 async function submitForm() {
     formErrors.value = {};
     saving.value = true;
-    const payload = {
-        ...form,
-        pbid: hasPr.value ? selectedPbid.value : null,
-        items: formItems.value,
-    };
     try {
-        await http.post(props.storeUrl, payload);
+        if (isEditMode.value) {
+            await http.put(props.updateUrl, { ...form, items: formItems.value });
+        } else {
+            await http.post(props.storeUrl, {
+                ...form,
+                pbid: hasPr.value ? selectedPbid.value : null,
+                items: formItems.value,
+            });
+        }
         window.location.href = props.indexUrl;
     } catch (e) {
         if (e.status === 422 && e.body?.errors) {
@@ -132,8 +164,8 @@ onMounted(() => {
                 <ArrowLeft class="size-4" />
             </a>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Buat Pesanan Pembelian</h1>
-                <p class="text-sm text-muted-foreground">Terbitkan pesanan pembelian ke supplier</p>
+                <h1 class="text-2xl font-bold tracking-tight">{{ isEditMode ? 'Edit Pesanan Pembelian' : 'Buat Pesanan Pembelian' }}</h1>
+                <p class="text-sm text-muted-foreground">{{ isEditMode ? 'Ubah pesanan pembelian yang belum diterima' : 'Terbitkan pesanan pembelian ke supplier' }}</p>
             </div>
         </div>
 
@@ -153,6 +185,7 @@ onMounted(() => {
                         option-value="pbid"
                         option-label="nomor_permintaan"
                         placeholder="Tanpa PR"
+                        :disabled="isEditMode"
                     />
                 </div>
                 <div class="space-y-2">
@@ -206,7 +239,7 @@ onMounted(() => {
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <Label>Item Barang</Label>
-                    <Button type="button" size="sm" variant="outline" @click="addRow" :disabled="hasPr">
+                    <Button type="button" size="sm" variant="outline" @click="addRow" :disabled="itemsLockedByPr">
                         <Plus class="mr-1 size-4" /> Tambah Item
                     </Button>
                 </div>
@@ -232,7 +265,7 @@ onMounted(() => {
                                         option-value="mbid"
                                         option-label="nama_barang"
                                         placeholder="Pilih barang"
-                                        :disabled="hasPr"
+                                        :disabled="itemsLockedByPr"
                                     />
                                 </td>
                                 <td class="p-2 align-top">
@@ -242,11 +275,11 @@ onMounted(() => {
                                         option-value="stid"
                                         option-label="nama_satuan"
                                         placeholder="Satuan"
-                                        :disabled="hasPr"
+                                        :disabled="itemsLockedByPr"
                                     />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <Input v-model="row.qty_dipesan" type="number" min="0.01" step="0.01" placeholder="Qty" :disabled="hasPr" />
+                                    <Input v-model="row.qty_dipesan" type="number" min="0.01" step="0.01" placeholder="Qty" :disabled="itemsLockedByPr" />
                                 </td>
                                 <td class="p-2 align-top">
                                     <Input
@@ -258,7 +291,7 @@ onMounted(() => {
                                     />
                                 </td>
                                 <td class="p-2 align-top">
-                                    <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" :disabled="hasPr" @click="removeRow(index)">
+                                    <button type="button" class="flex size-9 items-center justify-center text-muted-foreground hover:text-destructive" :disabled="itemsLockedByPr" @click="removeRow(index)">
                                         <Trash2 class="size-4" />
                                     </button>
                                 </td>
@@ -279,7 +312,7 @@ onMounted(() => {
                 <a :href="indexUrl">
                     <Button type="button" variant="outline">Batal</Button>
                 </a>
-                <Button type="submit" :disabled="formItems.length === 0 || !form.spid || saving">Simpan &amp; Terbitkan</Button>
+                <Button type="submit" :disabled="formItems.length === 0 || !form.spid || saving">{{ isEditMode ? 'Simpan Perubahan' : 'Simpan & Terbitkan' }}</Button>
             </div>
         </form>
     </div>

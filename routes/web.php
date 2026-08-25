@@ -74,10 +74,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/data', [PesananPembelianController::class, 'data'])->name('data');
         Route::get('/form-options', [PesananPembelianController::class, 'formOptions'])->name('form-options');
         Route::get('/create', [PesananPembelianController::class, 'create'])->name('create');
+        Route::get('/{ppid}/edit', [PesananPembelianController::class, 'edit'])->name('edit');
         Route::get('/dari-permintaan/{pbid}', [PesananPembelianController::class, 'dariPermintaan'])->name('dari-permintaan');
         Route::get('/{ppid}/print', [PesananPembelianController::class, 'print'])->name('print');
         Route::get('/{ppid}', [PesananPembelianController::class, 'show'])->name('show');
         Route::post('/', [PesananPembelianController::class, 'store'])->name('store');
+        Route::put('/{ppid}', [PesananPembelianController::class, 'update'])->name('update');
         Route::patch('/{ppid}/status', [PesananPembelianController::class, 'updateStatus'])->name('status');
     });
 
