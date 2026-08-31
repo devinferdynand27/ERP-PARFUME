@@ -289,6 +289,7 @@ dan kualitas bibit berbeda.
 | `barang_keluar_detail` | `bkdid` |
 | `supplier` | `spid` |
 | `satuan` | `stid` |
+| `kualitas` | `kuid` |
 | `permintaan_barang` | `pbid` |
 | `permintaan_barang_detail` | `pbdid` |
 | `pesanan_pembelian` | `ppid` |
@@ -349,6 +350,23 @@ dites end-to-end lewat curl): Aroma, Supplier, Produk, plus Satuan (§6a).
 Ukuran Botol dan Kualitas Bibit sempat dibuat lengkap tapi **dihapus total**
 2026-08-17 atas permintaan user — lihat catatan di §10 "Keputusan desain
 kunci".
+
+**Master Kualitas (2026-08-31, FT-14):** Modul master data baru, tabel
+`kualitas` (`kuid`, `nama_kualitas`, `keterangan` nullable, `aktif`, kolom
+audit pola §6a karena dibuat setelah `satuan`) — bukan retrofit
+`kualitas_bibit` lama yang sudah di-drop di §10 di atas, ini tabel baru
+dengan skema lebih sederhana (tanpa FK ke `produk`, murni dropdown/master
+data seperti `satuan`). `KualitasRepository`/`KualitasController` meniru
+persis pola `SatuanRepository`/`SatuanController` (`paginate()` pakai
+`WHERE 1 = 1` supaya item nonaktif tetap tampil di halaman manajemen,
+`getAktif()` terpisah untuk dropdown). Frontend: dialog CRUD di
+`KualitasManager.vue` (pola sama seperti `SatuanManager.vue`, bukan halaman
+terpisah — beda dari pola procurement §11), menu sidebar "Master Kualitas"
+(icon `Gem`) ditambahkan di bawah "Master Satuan". Route
+`master/kualitas` (name prefix `kualitas.`). Diverifikasi end-to-end di
+browser (Playwright headless): create → muncul di tabel → edit → toggle
+nonaktif → status berubah → navigasi sidebar fetch+swap dari dashboard ke
+halaman ini tanpa full reload — nol console error.
 
 **Produk** — detail implementasi:
 - `ProdukRepository::generateKodeProduk()` — generate `PRF-0001`, `PRF-0002`,

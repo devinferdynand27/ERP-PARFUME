@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import {
-    LayoutDashboard, Package, Truck, Scale,
+    LayoutDashboard, Package, Truck, Scale, Gem,
     ClipboardList, ShoppingCart, PackageCheck, X
 } from '@lucide/vue';
 
@@ -41,6 +41,7 @@ const masterData = [
     { key: 'supplier', label: 'Master Supplier', icon: Truck, urlKey: 'supplier' },
     { key: 'master-barang', label: 'Master Barang', icon: Package, urlKey: 'masterBarang' },
     { key: 'satuan', label: 'Master Satuan', icon: Scale, urlKey: 'satuan' },
+    { key: 'kualitas', label: 'Master Kualitas', icon: Gem, urlKey: 'kualitas' },
 ];
 
 const transaksi = [

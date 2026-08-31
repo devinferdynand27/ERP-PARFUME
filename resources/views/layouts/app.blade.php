@@ -19,6 +19,7 @@
                     'supplier' => route('supplier.index'),
                     'masterBarang' => route('master-barang.index'),
                     'satuan' => route('satuan.index'),
+                    'kualitas' => route('kualitas.index'),
                     'permintaanBarang' => route('permintaan-barang.index'),
                     'pesananPembelian' => route('pesanan-pembelian.index'),
                     'penerimaanBarang' => route('penerimaan-barang.index'),

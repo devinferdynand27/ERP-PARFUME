@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KualitasController;
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\PermintaanBarangController;
@@ -51,6 +52,15 @@ Route::middleware('auth')->group(function () {
             Route::post('/', [SatuanController::class, 'store'])->name('store');
             Route::put('/{stid}', [SatuanController::class, 'update'])->name('update');
             Route::patch('/{stid}/toggle-aktif', [SatuanController::class, 'toggleAktif'])->name('toggle-aktif');
+        });
+
+        // Master Kualitas
+        Route::prefix('master/kualitas')->name('kualitas.')->group(function () {
+            Route::get('/', [KualitasController::class, 'index'])->name('index');
+            Route::get('/data', [KualitasController::class, 'data'])->name('data');
+            Route::post('/', [KualitasController::class, 'store'])->name('store');
+            Route::put('/{kuid}', [KualitasController::class, 'update'])->name('update');
+            Route::patch('/{kuid}/toggle-aktif', [KualitasController::class, 'toggleAktif'])->name('toggle-aktif');
         });
     });
 
